@@ -56,16 +56,6 @@ import { requestLogout } from '../api/api';
 			return {
 				sysUserName: '',
 				sysUserAvatar: '../assets/user.png',
-				form: {
-					name: '',
-					region: '',
-					date1: '',
-					date2: '',
-					delivery: false,
-					type: [],
-					resource: '',
-					desc: ''
-				}
 			}
 		},
 		methods: {

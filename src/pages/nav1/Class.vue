@@ -4,13 +4,13 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
-				<el-form-item>
+				<!-- <el-form-item>
 					<el-input v-model="filters.name" placeholder="请输入课堂"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" @click="getUsers">查询</el-button>
-				</el-form-item>
-				<el-form-item>
+				</el-form-item> -->
+				<el-form-item style='float:right'>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
 				</el-form-item>
 			</el-form>
@@ -35,68 +35,144 @@
 				</el-table-column>
 			<el-table-column label="操作" width="140">
 				<template scope="scope">
-					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
-
+<!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
 			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="totalPage" style="float:right;">
 			</el-pagination>
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="editForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="editForm.addr"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
-			</div>
-		</el-dialog>
+		<!-- <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+					<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+						<el-form-item label="省份">
+							<el-select v-model="editForm.province" placeholder="请选择">
+							    <el-option
+							      v-for="item in options"
+							      :label="item.classifyName"
+							      :value="item.classifyName">
+							    </el-option>
+							  </el-select>
+						</el-form-item>
+						<el-form-item label="市区">
+							<el-select v-model="editForm.city" placeholder="请选择">
+							    <el-option
+							      v-for="item in options"
+							      :label="item.classifyName"
+							      :value="item.classifyId">
+							    </el-option>
+							  </el-select>
+						</el-form-item>
+						<el-form-item label="名称">
+							<el-input v-model="editForm.sName" placeholder="请输入价格" class='myInput'></el-input>
+						</el-form-item>
+						<el-form-item label="详细地址">
+							<el-input v-model="editForm.address" placeholder="请输入内容" class='myInput'></el-input>
+						</el-form-item>
+						<el-form-item label="营业时间">
+							<el-input v-model="editForm.businessHours" placeholder="请输入内容" class='myInput'></el-input>
+						</el-form-item>
+						<el-form-item label='学堂封面'>
+							<el-upload
+							  class="upload-demo"
+							  ref="upload1"
+							  :auto-upload="false"
+							  action="/momingtang/web/backCourse/updateCourse"
+							 >
+							<el-button slot="trigger" size="small" type="primary">选取图片</el-button>
+							<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+							</el-upload>
+						</el-form-item>
+						<el-form-item label='学堂介绍'>
+							<el-upload
+							  class="upload-demo"
+							  ref="upload2"
+							  :auto-upload="false"
+							  action="/momingtang/web/backCourse/updateCourse"
+							 >
+							<el-button slot="trigger" size="small" type="primary">选取图片</el-button>
+							<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+							</el-upload>
+						</el-form-item>
+						<el-form-item label="课程内容">
+							<el-input v-model="editForm.msg" placeholder="初识古琴"></el-input>
+							<el-input v-model="editForm.msg1" placeholder="琴行"></el-input>
+							<el-input v-model="editForm.msg2" placeholder="哈哈哈"></el-input>
+						</el-form-item>
+					</el-form>
+					<div slot="footer" class="dialog-footer">
+						<el-button @click.native="editFormVisible = false">取消</el-button>
+						<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+					</div>
+				</el-dialog> -->
 
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="课程" prop="name">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
+			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" enctype='multipart/form-data'>
+				<el-form-item label="省份" prop='province'>
+					<el-select v-model="addForm.province" placeholder="请选择省份">
+					    <el-option
+					      v-for="item in options"
+					      :label="item.province"
+					      :value="item.province">
+					    </el-option>
+					  </el-select>
 				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="addForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
+				<el-form-item label="市区" prop='city'>
+					<el-select v-model="addForm.city" placeholder="请选择城市">
+					    <el-option
+					      v-for="item in options"
+					      :label="item.city"
+					      :value="item.city">
+					    </el-option>
+					  </el-select>
 				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
+				<el-form-item label="名称" prop='sName'>
+					<el-input v-model="addForm.sName" placeholder="请输入名称" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+				<el-form-item label="详细地址" prop='address'>
+					<el-input v-model="addForm.address" placeholder="请输入街道地址" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="addForm.addr"></el-input>
+				<el-form-item label="营业时间" prop='businessHours'>
+					<el-input v-model="addForm.businessHours" placeholder="请输入时间" class='myInput'></el-input>
+					<!-- <el-time-picker 
+					    is-range
+					    format='HH:mm'
+					    placeholder="选择时间范围">
+					  </el-time-picker> -->
 				</el-form-item>
+				<el-form-item label='学堂封面' v-model="addForm.cover">
+					<el-upload
+					  class="upload-demo"
+					  ref="upload1"
+					  :auto-upload="false"
+					  action="/momingtang/web/backSchool/addSchool"
+					 >
+					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
+					<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+					</el-upload>
+				</el-form-item>
+				<el-form-item label="学堂介绍" v-model="addForm.detailsPic">
+					<el-upload
+					  class="upload-demo"
+					  ref="upload2"
+					  :auto-upload="false"
+					  action="/momingtang/web/backCourse/addCourse"
+					 >
+					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
+					<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+					</el-upload>
+				</el-form-item>
+				<!-- <el-form-item label="课程内容">
+					<el-input v-model="addForm.msg" placeholder="第一天课题"></el-input>
+					<el-input v-model="addForm.msg1" placeholder="第二天课题"></el-input>
+					<el-input v-model="addForm.msg2" placeholder="第三天课题"></el-input>
+				</el-form-item> -->
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
@@ -119,10 +195,11 @@
 					name: ''
 				},
 				users: [],
-				total:0,
+				totalPage:0,
 				currentPage: 0,
 				pageSize: 10,
 				listLoading: false,
+				options:[],
 				sels: [],//列表选中列
 
 				editFormVisible: false,//编辑界面是否显示
@@ -133,8 +210,8 @@
 					]
 				},
 				//编辑界面数据
-				editForm: {
-					sid: 1,
+				/*editForm: {
+					sid: 0,
 				    sName: "",
 				    sImage: "",
 				    detailsPic: "",
@@ -142,13 +219,19 @@
 				    address: "",
 				    province: "",
 				    city: ""
-				},
+				},*/
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
+					province: [
+						{ required: true, message: '请选择省份', trigger: 'blur' }
+					],
+					city: [
+						{ required: true, message: '请选择省份', trigger: 'blur' }
+					],
+					sName: [
+						{ required: true, message: '请输入名称', trigger: 'blur' }
 					]
 				},
 				//新增界面数据
@@ -156,7 +239,7 @@
 					sName: "",
 				    sImage: "",
 				    detailsPic: "",
-				    businessHours: "",
+				    businessHours:'',
 				    address: "",
 				    province: "",
 				    city: ""
@@ -166,17 +249,14 @@
 		},
 		methods: {
 			//性别显示转换
-			formatSex: function (row, column) {
-				return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
-			},
 			handleCurrentChange(val) {
-				this.page = val;
+				this.currentPage = val;
 				this.getUsers();
 			},
 			//获取用户列表
 			getUsers() {
 				let para = {
-					total:this.total,
+					totalPage:this.totalPage,
 					currentPage: this.currentPage,
 					pageSize: this.pageSize,
 					name: this.filters.name
@@ -190,7 +270,7 @@
 				})
 				.done(function(res) {
 					console.log(res);
-					this.total = res.data.totalPage;
+					this.totalPage = res.data.totalPage;
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;
@@ -221,19 +301,21 @@
 				});
 			},
 			//显示编辑界面
-			handleEdit: function (index, row) {
+			/*handleEdit: function (index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
-			},
+			},*/
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
+					sName: "",
+				    sImage: "",
+				    detailsPic: "",
+				    businessHours: '',
+				    address: "",
+				    province: "",
+				    city: ""
 				};
 			},
 			//编辑
@@ -269,7 +351,7 @@
 							this.addLoading = true;
 							NProgress.start();
 							let para = Object.assign({}, this.addForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
+							/*para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');*/
 							addUser(para).then((res) => {
 								this.addLoading = false;
 								NProgress.done();
@@ -321,6 +403,6 @@
 </script>
 
 <style scoped>
-
+.myInput{width:218px;}
 </style>
 

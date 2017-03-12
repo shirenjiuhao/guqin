@@ -4,13 +4,13 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
       <el-form :inline="true" :model="filters">
-        <el-form-item>
+        <!-- <el-form-item>
           <el-input v-model="filters.name" placeholder="请输入要查询的内容"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" v-on:click="getUsers">查询</el-button>
-        </el-form-item>
-        <el-form-item>
+        </el-form-item> -->
+        <el-form-item style='float:right'>
           <el-button type="primary" @click="handleAdd">新增</el-button>
         </el-form-item>
       </el-form>
@@ -37,67 +37,73 @@
         </el-table-column>
       <el-table-column label="操作" width="140">
         <template scope="scope">
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+          
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-
+<!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-      <el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+      <el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="totalPage" style="float:right;">
       </el-pagination>
     </el-col>
 
     <!--编辑界面-->
-    <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-      <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="editForm.name" auto-complete="off"></el-input>
-        </el-form-item>
-        <el-form-item label="性别">
-          <el-radio-group v-model="editForm.sex">
-            <el-radio class="radio" :label="1">男</el-radio>
-            <el-radio class="radio" :label="0">女</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="年龄">
-          <el-input-number v-model="editForm.age" :min="0" :max="200"></el-input-number>
-        </el-form-item>
-        <el-form-item label="生日">
-          <el-date-picker type="date" placeholder="选择日期" v-model="editForm.birth"></el-date-picker>
-        </el-form-item>
-        <el-form-item label="地址">
-          <el-input type="textarea" v-model="editForm.addr"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click.native="editFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
-      </div>
-    </el-dialog>
+  <!--   <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+    <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+      
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click.native="editFormVisible = false">取消</el-button>
+      <el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+    </div>
+  </el-dialog> -->
 
     <!--新增界面-->
     <el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-        <el-form-item label="课程" prop="name">
-          <el-input v-model="addForm.name" auto-complete="off"></el-input>
+        <el-form-item label="分类" prop='classifyName'>
+          <el-select v-model="addForm.classifyId" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :label="item.classifyName"
+                :value="item.classifyId">
+              </el-option>
+            </el-select>
         </el-form-item>
-        <el-form-item label="性别">
-          <el-radio-group v-model="addForm.sex">
-            <el-radio class="radio" :label="1">男</el-radio>
-            <el-radio class="radio" :label="0">女</el-radio>
-          </el-radio-group>
+        <el-form-item label="名称" prop='courseName'>
+          <el-input v-model="addForm.courseName" placeholder="请输入内容" class='myInput'></el-input>
         </el-form-item>
-        <el-form-item label="年龄">
-          <el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
+        <el-form-item label="价格" prop='cPrice'>
+          <el-input v-model="addForm.cPrice" placeholder="请输入价格" class='myInput'></el-input>
         </el-form-item>
-        <el-form-item label="生日">
-          <el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
+        <el-form-item label="老师" prop='classifyName'>
+          <el-select v-model="addForm.classifyId" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :label="item.classifyName"
+                :value="item.classifyId">
+              </el-option>
+            </el-select>
         </el-form-item>
-        <el-form-item label="地址">
-          <el-input type="textarea" v-model="addForm.addr"></el-input>
+        <el-form-item label="学堂" prop='classifyName'>
+          <el-select v-model="addForm.classifyId" placeholder="请选择">
+              <el-option
+                v-for="item in options"
+                :label="item.classifyName"
+                :value="item.classifyId">
+              </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="授课时间">
+          <el-date-picker
+            v-model="addForm.bespeakTime"
+            type="date"
+            placeholder="选择日期"
+            :picker-options="pickerOptions0">
+          </el-date-picker>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -120,29 +126,29 @@
           name: ''
         },
         users: [],
-        total: 0,
+        totalPage: 0,
         currentPage: 0,
         pageSize: 10,
         listLoading: false,
+        options:[],
         sels: [],//列表选中列
-
+/*
         editFormVisible: false,//编辑界面是否显示
         editLoading: false,
         editFormRules: {
           name: [
             { required: true, message: '请输入姓名', trigger: 'blur' }
           ]
-        },
+        },*/
         //编辑界面数据
-        editForm: {
-          id: 0,
-          name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
+        /*editForm: {
+          
+        },*/
+        pickerOptions0: {
+          disabledDate(time) {
+            return time.getTime() < Date.now() - 8.64e7;
+          }
         },
-
         addFormVisible: false,//新增界面是否显示
         addLoading: false,
         addFormRules: {
@@ -152,28 +158,27 @@
         },
         //新增界面数据
         addForm: {
-          name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
+          classifyId:'',
+          classifyName:'',
+          courseName:'',
+          cPrice:'',
+          tname:'',
+          sName:'',
+          bespeakTime:[]
         }
 
       }
     },
     methods: {
       //性别显示转换
-      formatSex: function (row, column) {
-        return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
-      },
       handleCurrentChange(val) {
-        this.page = val;
+        this.currentPage = val;
         this.getUsers();
       },
       //获取用户列表
       getUsers() {
         let para = {
-          total:this.total,
+          totalPage:this.totalPage,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
           name: this.filters.name
@@ -187,7 +192,7 @@
         })
         .done(function(res) {
           console.log(res);
-          this.total = res.data.totalPage;
+          this.totalPage = res.data.totalPage;
           this.currentPage = res.data.currentPage;
           this.pageSize = res.data.pageSize;
           this.users = res.data.datas;
@@ -218,23 +223,25 @@
         });
       },
       //显示编辑界面
-      handleEdit: function (index, row) {
+     /* handleEdit: function (index, row) {
         this.editFormVisible = true;
         this.editForm = Object.assign({}, row);
-      },
+      },*/
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          name: '',
-          sex: -1,
-          age: 0,
-          birth: '',
-          addr: ''
+          classifyId:'',
+          classifyName:'',
+          courseName:'',
+          cPrice:'',
+          tname:'',
+          sName:'',
+          bespeakTime:[]
         };
       },
       //编辑
-      editSubmit: function () {
+      /*editSubmit: function () {
         this.$refs.editForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
@@ -257,7 +264,7 @@
             });
           }
         });
-      },
+      },*/
       //新增
       addSubmit: function () {
         this.$refs.addForm.validate((valid) => {
@@ -266,8 +273,42 @@
               this.addLoading = true;
               NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              addUser(para).then((res) => {
+              para.bespeakTime = (!para.bespeakTime || para.bespeakTime == '') ? '' : util.formatDate.format(new Date(para.bespeakTime), 'MM.dd');
+              $.ajax({
+                url: '/momingtang/web/backCourseRelation/addCourseRelation',
+                type: 'POST',
+                data: para,
+              })
+              .done(function(res) {
+                 this.addLoading = false;
+                 NProgress.done();
+                console.log("success");
+                if(res.status ==1){
+                  this.$notify({
+                    title: '成功',
+                    message: '提交成功',
+                    type: 'success'
+                  });
+                  this.$refs['addForm'].resetFields();
+                }else{
+                  this.$notify({
+                    title: '失败',
+                    message: '提交失败',
+                    type: 'error'
+                  });
+                }
+                
+                this.addFormVisible = false;
+                this.getUsers();
+              })
+              .fail(function() {
+                console.log("error");
+              })
+              .always(function() {
+                console.log("complete");
+              });
+              
+              /*addUser(para).then((res) => {
                 this.addLoading = false;
                 NProgress.done();
                 this.$notify({
@@ -278,7 +319,7 @@
                 this.$refs['addForm'].resetFields();
                 this.addFormVisible = false;
                 this.getUsers();
-              });
+              });*/
             });
           }
         });
@@ -318,6 +359,6 @@
 </script>
 
 <style scoped>
-
+.myInput{width:218px;}
 </style>
 

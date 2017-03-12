@@ -34,8 +34,8 @@ let routes = [
             { path: '/main', component: Main, name: '主页', hidden: true },
             { path: '/course', component: Course, name: '课程信息' },
             { path: '/class', component: Class, name: '学堂信息' },
-            { path: '/teacher', component: Teacher, name: '老师信息' },
-            { path: '/ware', component: Ware, name: '商品信息' },
+            { path: '/teacher', component: Teacher, name: '老师信息' }/*,
+            { path: '/ware', component: Ware, name: '商品信息' },*/
         ]
     },
     {
@@ -48,7 +48,7 @@ let routes = [
             { path: '/page5', component: Page5, name: '报名信息' }
         ]
     },
-    {
+   /* {
         path: '/',
         component: Home,
         name: '商城',
@@ -66,7 +66,7 @@ let routes = [
         children: [
             { path: '/echarts', component: echarts, name: 'echarts' }
         ]
-    },
+    },*/
     {
         path: '*',
         hidden: true,

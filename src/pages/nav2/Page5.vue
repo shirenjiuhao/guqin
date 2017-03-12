@@ -41,7 +41,7 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
 			</el-pagination>
 		</el-col>
 	</section>
@@ -59,36 +59,35 @@ import $ from 'jquery'
 					name:'',
 				},
 				users: [],
-				total: 0,
-				totalPage:0,
-				currentPage: 0,
-				pageSize: 20,
+				totalPage:0,//总页数
+				currentPage: 0,//当前页
+				pageSize: 20,//每页显示条数
 				listLoading: false,
 
 				//选择时间
 				 pickerOptions1: {
-          shortcuts: [{
-            text: '今天',
-            onClick(picker) {
-              picker.$emit('pick', new Date());
-            }
-          }, {
-            text: '昨天',
-            onClick(picker) {
-              const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24);
-              picker.$emit('pick', date);
-            }
-          }, {
-            text: '一周前',
-            onClick(picker) {
-              const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-              picker.$emit('pick', date);
-            }
-          }]
-        }
-      }
+		          shortcuts: [{
+		            text: '今天',
+		            onClick(picker) {
+		              picker.$emit('pick', new Date());
+		            }
+		          }, {
+		            text: '昨天',
+		            onClick(picker) {
+		              const date = new Date();
+		              date.setTime(date.getTime() - 3600 * 1000 * 24);
+		              picker.$emit('pick', date);
+		            }
+		          }, {
+		            text: '一周前',
+		            onClick(picker) {
+		              const date = new Date();
+		              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+		              picker.$emit('pick', date);
+		            }
+		          }]
+		        }
+		      }
 		},
 		methods: {
 			
@@ -102,7 +101,7 @@ import $ from 'jquery'
 				this.filters.name = (!this.filters.name || this.filters.name == '') ? '' : util.formatDate.format(new Date(this.filters.name), 'yyyy-MM-dd');
 				console.log(typeof this.filters.name);
 				let para = {
-					total:this.total,
+					totalPage:this.totalPage,
 					currentPage: this.currentPage,
 					pageSize: this.pageSize,
 					date: this.filters.name,
@@ -118,10 +117,10 @@ import $ from 'jquery'
 				  console.log(res);
 				  NProgress.done();
 				  if(res.status == 1){
-				  	this.total = res.data.totalPage;
-								this.currentPage = res.data.currentPage;
-								this.pageSize = res.data.pageSize;
-								this.users = res.data.datas;
+				  	this.totalPage = res.data.totalPage;
+					this.currentPage = res.data.currentPage;
+					this.pageSize = res.data.pageSize;
+					this.users = res.data.datas;
 				  }else{
 				  	this.users = [];
 				  }
