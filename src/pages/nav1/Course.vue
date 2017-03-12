@@ -247,14 +247,16 @@
 			},
 			//删除
 			handleDel: function (index, row) {
+				console.log(row.cid)
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
 					// NProgress.start();
-					let para = { cid: row.id };
+					let para = { cid: row.cid };
+					console.log(para)
 					$.ajax({
-						url: `/web/backCourse/deleteCourse/:${cid}`,
+						url: `/web/backCourse/deleteCourse/${para.cid}`,
 						type: 'POST',
 						data: para,
 					})
@@ -413,7 +415,7 @@
 					NProgress.start();
 					let para = { ids: ids };
 					$.ajax({
-						url: `/web/backCourse/deleteCourse/:${cid}`,
+						url: '/web/backCourse/deleteCourse/:cid',
 						type: 'POST',
 						data: para,
 					})

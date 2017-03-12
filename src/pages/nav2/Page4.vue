@@ -273,7 +273,7 @@
               this.addLoading = true;
               NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.bespeakTime = (!para.bespeakTime || para.bespeakTime == '') ? '' : util.formatDate.format(new Date(para.bespeakTime), 'MM.dd');
+              para.bespeakTime = (!para.bespeakTime || para.bespeakTime == '') ? '' : util.formatDate.format(new Date(para.bespeakTime), 'MM-dd');
               $.ajax({
                 url: '/momingtang/web/backCourseRelation/addCourseRelation',
                 type: 'POST',
