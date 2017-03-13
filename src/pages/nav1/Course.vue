@@ -43,10 +43,10 @@
 
 		<!--编辑界面-->
 		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm"  name='editForm' action="/momingtang/web/backCourse/updateCourse" enctype='multipart/form-data' id='editForm' method='post'
+			<el-form :model="editForm" label-width="80px" ref="editForm"  name='editForm' action="/momingtang/web/backCourse/updateCourse" enctype='multipart/form-data' id='editForm' method='post'
 			>
 				<el-form-item label="分类">
-					<select name="classifyId" class='classifyId' placeholder="请选择">
+					<select name="cid" class='classifyId' v-model='editForm.classifyName' placeholder="请选择">
 					    <option
 					      v-for="item in options"
 					      :value="item.classifyId">{{item.classifyName}}
@@ -54,15 +54,17 @@
 					  </select>
 				</el-form-item>
 				<el-form-item label="价格">
-					<el-input name="cPrice" placeholder="请输入价格" class='myInput'></el-input>
+					<el-input name="cPrice" v-model='editForm.cPrice' placeholder="请输入价格" class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label="名称">
-					<el-input name="courseName" placeholder="请输入内容" class='myInput'></el-input>
+					<el-input name="courseName" v-model='editForm.courseName' placeholder="请输入内容" class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label='背景图片'>
 					<input type="file" name='cover'>
 				</el-form-item>
-				
+				<el-form-item label='课程详情'>
+					<input type="file" name='detailsPic'>
+				</el-form-item>
 				<!-- <el-form-item label="课程内容">
 					<el-input v-model="editForm.msg" placeholder="初识古琴"></el-input>
 					<el-input v-model="editForm.msg1" placeholder="琴行"></el-input>
@@ -109,7 +111,6 @@
 				<el-button @click.native="addFormVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
-				
 		</el-dialog>
 	</section>
 </template>
@@ -250,7 +251,7 @@
 							this.$notify({
 								title: '失败',
 								message: '删除失败',
-								type: 'success'
+								type: 'error'
 							});
 							this.getUsers();
 						}
@@ -278,31 +279,31 @@
 						url:'/momingtang/web/backCourse/updateCourse',
 						type:'post',
 						beforeSerialize:function(res){
-							console.log(res)
+							//console.log(res)
 						},
 						beforeSubmit:function(res){
-							console.log(res)
+							//console.log(res)
 						},
 						success: function(res){
 							console.log(res)
 							this.editLoading = false;
 							NProgress.done();
 							if(res.status == 1){
-									this.$notify({
-										title: '成功',
-										message: '提交成功',
-										type: 'success'
-									});
-									this.$refs['addForm'].resetFields();
-								}else{
-									this.$notify({
-										title: '失败',
-										message: '提交失败',
-										type: 'error'
-									});
-								}
-								this.addFormVisible = false;
-								this.getUsers();
+								this.$notify({
+									title: '成功',
+									message: '提交成功',
+									type: 'success'
+								});
+								this.$refs['editForm'].resetFields();
+							}else{
+								this.$notify({
+									title: '失败',
+									message: '提交失败',
+									type: 'error'
+								});
+							}
+							this.editFormVisible = false;
+							this.getUsers();
 						}.bind(this),
 						error: function(res) {
 							this.editLoading = false;

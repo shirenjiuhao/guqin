@@ -207,16 +207,38 @@
         }).then(() => {
           this.listLoading = true;
           NProgress.start();
-          let para = { id: row.id };
-          removeUser(para).then((res) => {
+          let para = { rid: row.rid };
+         $.ajax({
+            url:  '/momingtang/web/backCourseRelation/deleteCourseRelationTime',
+            type: 'POST',
+            data: para,
+          })
+          .done(function(res) {
             this.listLoading = false;
             NProgress.done();
-            this.$notify({
-              title: '成功',
-              message: '删除成功',
-              type: 'success'
-            });
+            console.log("success");
+            if(res.status ==1){
+              this.$notify({
+                title: '成功',
+                message: '删除成功',
+                type: 'success'
+              });
+            }else{
+              this.$notify({
+                title: '失败',
+                message: '删除失败',
+                type: 'error'
+              });
+            }
             this.getUsers();
+          }.bind(this))
+          .fail(function() {
+            console.log("error");
+            this.listLoading = false;
+            NProgress.done();
+          })
+          .always(function() {
+            console.log("complete");
           });
         }).catch(() => {
 

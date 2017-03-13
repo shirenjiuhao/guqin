@@ -113,60 +113,42 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" enctype='multipart/form-data'>
-				<el-form-item label="省份" prop='province'>
-					<el-select v-model="addForm.province" placeholder="请选择省份">
-					    <el-option
+			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" name='addForm' action="/momingtang/web/backSchool/addSchool" enctype='multipart/form-data' id='addForm' method='post'>
+				<el-form-item label="归属地" name='attribution'>
+					<select name="province" placeholder="请选择省份">
+					    <option
 					      v-for="item in options"
-					      :label="item.province"
-					      :value="item.province">
-					    </el-option>
-					  </el-select>
-				</el-form-item>
-				<el-form-item label="市区" prop='city'>
-					<el-select v-model="addForm.city" placeholder="请选择城市">
-					    <el-option
+					      :value="item.province">{{item.province}}广州
+					    </option>
+					  </select>
+				<!-- </el-form-item>
+				<el-form-item label="市区" prop='city'> -->
+					<select name="city" placeholder="请选择城市">
+					    <option
 					      v-for="item in options"
-					      :label="item.city"
-					      :value="item.city">
-					    </el-option>
-					  </el-select>
+					      :value="item.city">{{item.city}}广州
+					    </option>
+					  </select>
 				</el-form-item>
-				<el-form-item label="名称" prop='sName'>
-					<el-input v-model="addForm.sName" placeholder="请输入名称" class='myInput'></el-input>
+				<el-form-item label="名称">
+					<el-input name="sName" placeholder="请输入名称" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="详细地址" prop='address'>
-					<el-input v-model="addForm.address" placeholder="请输入街道地址" class='myInput'></el-input>
+				<el-form-item label="详细地址">
+					<el-input name="address" placeholder="请输入街道地址" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="营业时间" prop='businessHours'>
-					<el-input v-model="addForm.businessHours" placeholder="请输入时间" class='myInput'></el-input>
+				<el-form-item label="营业时间">
+					<el-input name="businessHours" placeholder="请输入时间" class='myInput'></el-input>
 					<!-- <el-time-picker 
 					    is-range
 					    format='HH:mm'
 					    placeholder="选择时间范围">
 					  </el-time-picker> -->
 				</el-form-item>
-				<el-form-item label='学堂封面' v-model="addForm.cover">
-					<el-upload
-					  class="upload-demo"
-					  ref="upload1"
-					  :auto-upload="false"
-					  action="/momingtang/web/backSchool/addSchool"
-					 >
-					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-					<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-					</el-upload>
+				<el-form-item label='学堂封面'>
+					<input type="file" name='cover'>
 				</el-form-item>
-				<el-form-item label="学堂介绍" v-model="addForm.detailsPic">
-					<el-upload
-					  class="upload-demo"
-					  ref="upload2"
-					  :auto-upload="false"
-					  action="/momingtang/web/backCourse/addCourse"
-					 >
-					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-					<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-					</el-upload>
+				<el-form-item label="学堂介绍">
+					<input type="file" name='sdetailsPic'>
 				</el-form-item>
 				<!-- <el-form-item label="课程内容">
 					<el-input v-model="addForm.msg" placeholder="第一天课题"></el-input>
@@ -186,7 +168,8 @@
 	import util from '../../common/js/util'
 	import NProgress from 'nprogress'
 	import $ from 'jquery'
-	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
+	import '../../jquery-from.js'
+/*	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';*/
 
 	export default {
 		data() {
@@ -210,7 +193,7 @@
 					]
 				},
 				//编辑界面数据
-				/*editForm: {
+				editForm: {
 					sid: 0,
 				    sName: "",
 				    sImage: "",
@@ -219,7 +202,7 @@
 				    address: "",
 				    province: "",
 				    city: ""
-				},*/
+				},
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
@@ -248,7 +231,7 @@
 			}
 		},
 		methods: {
-			//性别显示转换
+			//分页展示
 			handleCurrentChange(val) {
 				this.currentPage = val;
 				this.getUsers();
@@ -285,17 +268,33 @@
 				}).then(() => {
 					this.listLoading = true;
 					NProgress.start();
-					let para = { cid: row.cid };
-					removeUser(para).then((res) => {
+					let para = { sid: row.sid };
+					$.ajax({
+						url: `/momingtang/web/backSchool/deleteSchool/${para.sid}`,
+						type: 'POST',
+						data: para,
+					})
+					.done(function(res) {
+						console.log("success-----单个删除");
 						this.listLoading = false;
 						NProgress.done();
-						this.$notify({
-							title: '成功',
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getUsers();
-					});
+						console.log(res)
+						if(res.status == 1){
+							this.$notify({
+								title: '成功',
+								message: '删除成功',
+								type: 'success'
+							});
+							this.getUsers();
+						}else{
+							this.$notify({
+								title: '失败',
+								message: '删除失败',
+								type: 'error'
+							});
+							this.getUsers();
+						}
+					}.bind(this));
 				}).catch(() => {
 
 				});
@@ -319,7 +318,7 @@
 				};
 			},
 			//编辑
-			editSubmit: function () {
+			/*editSubmit: function () {
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
@@ -342,16 +341,16 @@
 						});
 					}
 				});
-			},
+			},*/
 			//新增
-			addSubmit: function () {
-				this.$refs.addForm.validate((valid) => {
+			addSubmit: function (e) {
+				/*this.$refs.addForm.validate((valid) => {
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.addLoading = true;
 							NProgress.start();
 							let para = Object.assign({}, this.addForm);
-							/*para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');*/
+							/*para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
 							addUser(para).then((res) => {
 								this.addLoading = false;
 								NProgress.done();
@@ -366,7 +365,54 @@
 							});
 						});
 					}
-				});
+				});*/
+				e.preventDefault();
+				this.$confirm('确认提交吗？', '提示', {}).then(() => {
+					this.addLoading = true;
+					NProgress.start();
+					/*let para = $('#addForm').serialize();
+					  console.log(para);*/
+					$('#addForm').ajaxSubmit({
+						url:'/momingtang/web/backSchool/addSchool',
+						type:'post',
+						beforeSerialize:function(res){
+							console.log(res)
+						},
+						beforeSubmit:function(res){
+							console.log(res)
+						},
+						success: function(res){
+							console.log(res)
+							this.addLoading = false;
+							NProgress.done();
+							if(res.status == 1){
+									this.$notify({
+										title: '成功',
+										message: '提交成功',
+										type: 'success'
+									});
+									this.$refs['addForm'].resetFields();
+								}else{
+									this.$notify({
+										title: '失败',
+										message: '提交失败',
+										type: 'error'
+									});
+								}
+								this.addFormVisible = false;
+								this.getUsers();
+						}.bind(this),
+						error: function(res) {
+							this.addLoading = false;
+							NProgress.done();
+							this.$notify({
+								title: '失败',
+								message: '提交失败',
+								type: 'error'
+							});
+						}.bind(this)
+					})
+				})
 			},
 			selsChange: function (sels) {
 				this.sels = sels;
