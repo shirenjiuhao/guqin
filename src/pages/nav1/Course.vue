@@ -85,9 +85,10 @@
 
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" >
+			 <el-form :model='addForm' label-width="80px" ref="addForm" name='addForm' action="/momingtang/web/backCourse/addCourse" enctype='multipart/form-data' id='addForm'
+			>
 				<el-form-item label="分类">
-					<el-select v-model="addForm.classifyId" placeholder="请选择">
+					<el-select v-model='addForm.classifyId' name='classifyId' id='classifyId' placeholder="请选择">
 					    <el-option
 					      v-for="item in options"
 					      :label="item.classifyName"
@@ -95,44 +96,69 @@
 					    </el-option>
 					  </el-select>
 				</el-form-item>
-				<el-form-item label="名称" prop='courseName'>
-					<el-input v-model="addForm.courseName" placeholder="请输入内容" class='myInput'></el-input>
+				<el-form-item label="名称">
+					<el-input name='courseName' placeholder="请输入内容" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="价格" prop='cPrice'>
-					<el-input v-model="addForm.cPrice" placeholder="请输入价格" class='myInput'></el-input>
+				<el-form-item label="价格">
+					<el-input name='cPrice' placeholder="请输入价格" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label='背景图片' prop='cover'>
-					<el-upload
+				<el-form-item label='背景图片'>
+					<input type='file' name='cover'/>
+					<!-- <el-upload
 					  class="upload-demo"
 					  ref="upload1"
+					  list-type='file'
 					  :auto-upload="false"
 					  action="/momingtang/web/backCourse/addCourse"
 					 >
 					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-					<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-					</el-upload>
+					</el-upload> -->
 				</el-form-item>
-				<el-form-item label="课程介绍" prop='detailsPic'>
-					<el-upload
+				<el-form-item label="课程介绍">
+					<input type="file" name='detailsPic'>
+					<!-- <el-upload
 					  class="upload-demo"
 					  ref="upload2"
 					  :auto-upload="false"
+					  list-type='file'
 					  action="/momingtang/web/backCourse/addCourse"
 					 >
-					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-					<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-					</el-upload>
+					 <el-button slot="trigger" size="small" type="primary">选取图片</el-button> 
+					</el-upload>-->
 				</el-form-item>
 				<!-- <el-form-item label="课程内容">
 					<el-input v-model="addForm.msg" placeholder="第一天课题"></el-input>
 					<el-input v-model="addForm.msg1" placeholder="第二天课题"></el-input>
 					<el-input v-model="addForm.msg2" placeholder="第三天课题"></el-input>
 				</el-form-item> -->
-			</el-form>
+				
+			</el-form> 
+			<!-- <form action="/momingtang/web/backCourse/addCourse" method="post" enctype='multipart/form-data' id='addForm'>
+				<div>
+					 <span>类型：</span><input type="text" name="classifyId"/>
+				</div>
+				<div>
+					<span>名称：</span><input type="text" name="courseName"/>
+				</div>
+				<div>
+					<span>价格： </span><input type="number" name="cPrice"/>
+				</div>    
+				<div>
+					 <span>背景图片: </span><input type="file" name="cover"/>
+				</div>    
+				<div>
+					 <span>课程介绍：</span><input type="file" name="detailsPic"/>
+				</div>   
+				<div>
+					 <el-button @click.native="addFormVisible = false">取消</el-button>
+					<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				</div>   
+				</form>  -->
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+				<el-button type="primary" @click.native="addSubmit" id='addSubmit' :loading="addLoading">提交</el-button>
 			</div>
+				
 		</el-dialog>
 	</section>
 </template>
@@ -142,6 +168,7 @@
 	import NProgress from 'nprogress'
 	//import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
 	import $ from 'jquery'
+	import '../../jquery-from.js'
 	export default {
 		data() {
 			return {
@@ -180,7 +207,7 @@
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
-					classifyName: [
+					/*classifyName: [
 						{ required: true, message: '请选择类型', trigger: 'blur' }
 					],
 					cPrice:[
@@ -188,7 +215,7 @@
 					],
 					courseName:[
 						{ required: true, message: '请输入课程名称', trigger: 'blur' }
-					]
+					]*/
 				},
 				//新增界面数据
 				options:[],
@@ -197,8 +224,6 @@
 					classifyName: '',
 					cPrice:'',
 					classifyId:'',//课程分类ID
-					cover:{},
-					detailsPic:{},
 				}
 
 			}
@@ -297,8 +322,6 @@
 					classifyName: '',
 					cPrice:'',
 					classifyId:'',//课程分类ID
-					cover:{},
-					detailsPic:{},
 				};
 			},
 			//编辑
@@ -347,58 +370,112 @@
 				});
 			},
 			//新增
-			addSubmit: function () {
-				this.$refs.addForm.validate((valid) => {
-					if (valid) {
-				this.$confirm('确认提交吗？', '提示', {}).then(() => {
-					console.log(this.$refs.upload1.uploadFiles[0].raw)
-					console.log(this.addForm.cover)
-					this.addForm.cover = {...this.$refs.upload1.uploadFiles[0].raw};
-					this.addForm.detailsPic = {...this.$refs.upload2.uploadFiles[0].raw};
-					this.addLoading = true;
-					NProgress.start();
-					let para = Object.assign({}, this.addForm);
-					$.ajax({
-						url: '/momingtang/web/backCourse/addCourse',
-						type: 'POST',
-						data: para
-					})
-					.done(function(res) {
-						console.log("success");
-						this.addLoading = false;
-						NProgress.done();
-						this.$notify({
-							title: '成功',
-							message: '提交成功',
-							type: 'success'
-						});
-						this.$refs['addForm'].resetFields();
-						this.addFormVisible = false;
-						this.getUsers();
-					}.bind(this))
-					.fail(function(err) {
-						console.log("error");
-						console.log(err)
-					})
-					.always(function() {
-						console.log("complete");
-					});
+			addSubmit: function (e) {
+				e.preventDefault();
+				var _this = this
+				/*this.$confirm('确认提交吗？', '提示', {}).then(() => {
+					$('#fm').form('submit', {
+							   url : '${pageContext.request.contextPath}/web/active/addActivity',
+							   success : function(data) {
+							    if (data == 'ok') {
+							     $.messager.alert('消息', '保存成功！');
+							     $('#dg').datagrid('reload');
+							     $('#dlg').dialog('close');//关闭弹框                      
+							    }
+							   }
+							  });*/
+				/*this.$refs.addForm.validate((valid) => {
+					if (valid) {*/
+						this.$confirm('确认提交吗？', '提示', {}).then(() => {
+							console.log('--------------------------------------------')
+							this.addLoading = true;
+							NProgress.start();
+							alert(1)
+							let para = $('#addForm').serialize();
+							console.log(para);
+							
+								$('#addForm').ajaxSubmit({
+									url:'/momingtang/web/backCourse/addCourse',
+									tytpe:'post',
+									beforeSerialize:function(res){
+										let a = $('#classifyId').value
+										console.log(res)
+										console.log($('#classifyId').name);
+										/*switch(a){
+											case '基础课程':
+											$('#classifyId').value=1
+											break;
+											case '进阶课程':
+											$('#classifyId').value=2
+											break;
+											case '精进课程':
+											$('#classifyId').value=3
+
+										}*/
+									},
+									beforeSubmit:function(res){
+										console.log(res)
+									},
+									success: function(res){
+										console.log(res)
+										this.addLoading = false;
+										NProgress.done();
+										alert('消息保存成功！');
+									}
+								})
 					
-					/*addUser(para).then((res) => {
-						this.addLoading = false;
-						NProgress.done();
-						this.$notify({
-							title: '成功',
-							message: '提交成功',
-							type: 'success'
+							
+							/*$.ajax({
+								cache: true,
+								url: '/momingtang/web/backCourse/addCourse',
+								type: 'POST',
+								async: false,
+								data: para
+							})
+							.done(function(res) {
+								console.log("success");
+								this.addLoading = false;
+								NProgress.done();
+								if(res.status == 1){
+									this.$notify({
+										title: '成功',
+										message: '提交成功',
+										type: 'success'
+									});
+									this.$refs['addForm'].resetFields();
+								}else{
+									this.$notify({
+										title: '失败',
+										message: '提交失败',
+										type: 'error'
+									});
+								}
+								this.addFormVisible = false;
+								this.getUsers();
+							}.bind(this))
+							.fail(function(err) {
+								console.log("error");
+								console.log(err)
+							})
+							.always(function() {
+								console.log("complete");
+							});*/
+							
+							/*addUser(para).then((res) => {
+								this.addLoading = false;
+								NProgress.done();
+								this.$notify({
+									title: '成功',
+									message: '提交成功',
+									type: 'success'
+								});
+								this.$refs['addForm'].resetFields();
+								this.addFormVisible = false;
+								this.getUsers();
+							});*/
 						});
-						this.$refs['addForm'].resetFields();
-						this.addFormVisible = false;
-						this.getUsers();
-					});*/
-				});
-					}
-				})
+				/*	}
+				})*/
 			},
 			selsChange: function (sels) {
 				this.sels = sels;
