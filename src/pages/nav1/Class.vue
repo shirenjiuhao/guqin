@@ -285,7 +285,7 @@
 				}).then(() => {
 					this.listLoading = true;
 					NProgress.start();
-					let para = { id: row.id };
+					let para = { cid: row.cid };
 					removeUser(para).then((res) => {
 						this.listLoading = false;
 						NProgress.done();

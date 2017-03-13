@@ -86,7 +86,7 @@
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" >
-				<el-form-item label="分类" prop='classifyName'>
+				<el-form-item label="分类">
 					<el-select v-model="addForm.classifyId" placeholder="请选择">
 					    <el-option
 					      v-for="item in options"
@@ -247,23 +247,23 @@
 			},
 			//删除
 			handleDel: function (index, row) {
-				console.log(row.cid)
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
-					// NProgress.start();
+					 NProgress.start();
 					let para = { cid: row.cid };
 					console.log(para)
 					$.ajax({
-						url: `/web/backCourse/deleteCourse/${para.cid}`,
+						url: `/momingtang/web/backCourse/deleteCourse/${para.cid}`,
 						type: 'POST',
 						data: para,
 					})
 					.done(function(res) {
 						console.log("success-----单个删除");
 						this.listLoading = false;
-							// NProgress.done();
+						NProgress.done();
+						console.log(res)
 						if(res.status == 1){
 							this.$notify({
 								title: '成功',
@@ -279,13 +279,7 @@
 							});
 							this.getUsers();
 						}
-					})
-					.fail(function() {
-						console.log("error");
-					})
-					.always(function() {
-						console.log("complete");
-					});
+					}.bind(this));
 				}).catch(() => {
 
 				});
@@ -313,7 +307,7 @@
 				this.$confirm('确认提交吗？', '提示', {}).then(() => {
 					this.editLoading = true;
 					NProgress.start();
-					this.addForm.cover = Object.assign({}, this.$refs.upload.uploadFiles[0].raw);
+					this.addForm.cover = Object.assign({}, this.$refs.upload);
 					let para = Object.assign({}, this.editForm);
 					console.log(para)
 					$.ajax({
@@ -354,11 +348,13 @@
 			},
 			//新增
 			addSubmit: function () {
+				this.$refs.addForm.validate((valid) => {
+					if (valid) {
 				this.$confirm('确认提交吗？', '提示', {}).then(() => {
-					console.log(this.$refs.upload1.uploadFiles)
+					console.log(this.$refs.upload1.uploadFiles[0].raw)
 					console.log(this.addForm.cover)
-					this.addForm.cover = Object.assign({}, this.$refs.upload1.uploadFiles[0].raw);
-					this.addForm.detailsPic = Object.assign({}, this.$refs.upload2.uploadFiles[0].raw);
+					this.addForm.cover = {...this.$refs.upload1.uploadFiles[0].raw};
+					this.addForm.detailsPic = {...this.$refs.upload2.uploadFiles[0].raw};
 					this.addLoading = true;
 					NProgress.start();
 					let para = Object.assign({}, this.addForm);
@@ -401,6 +397,8 @@
 						this.getUsers();
 					});*/
 				});
+					}
+				})
 			},
 			selsChange: function (sels) {
 				this.sels = sels;
@@ -413,9 +411,9 @@
 				}).then(() => {
 					this.listLoading = true;
 					NProgress.start();
-					let para = { ids: ids };
+					let para = { cid: ids };
 					$.ajax({
-						url: '/web/backCourse/deleteCourse/:cid',
+						url: `/momingtang/web/backCourse/deleteCourse/${para.cid}`,
 						type: 'POST',
 						data: para,
 					})
@@ -438,23 +436,13 @@
 							});
 							this.getUsers();
 						}
-					})
+					}.bind(this))
 					.fail(function() {
 						console.log("error");
 					})
 					.always(function() {
 						console.log("complete");
 					});
-					/*batchRemoveUser(para).then((res) => {
-						this.listLoading = false;
-						NProgress.done();
-						this.$notify({
-							title: '成功',
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getUsers();
-					});*/
 				}).catch(() => {
 
 				});
