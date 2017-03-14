@@ -17,10 +17,10 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
-			<!-- <el-table :data="users" highlight-current-row v-loading="loading" style="width: 100%;"> -->
-			<el-table-column type="selection" width="50">
-			</el-table-column>
+		<el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%;">
+			<!-- <el-table :data="users" highlight-current-row v-loading="loading" style="width: 100%;"> @selection-change="selsChange" -->
+			<!-- <el-table-column type="selection" width="50">
+			</el-table-column> -->
 				<el-table-column type="index" prop='sid' width="40">
 				</el-table-column>
 				<el-table-column prop="province" label="省份" width="90" sortable>
@@ -35,109 +35,97 @@
 				</el-table-column>
 			<el-table-column label="操作" width="140">
 				<template scope="scope">
+					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
-<!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="totalPage" style="float:right;">
+			<!-- <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
+			<el-pagination layout="total, prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
 			</el-pagination>
 		</el-col>
 
 		<!--编辑界面-->
-		<!-- <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-					<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-						<el-form-item label="省份">
-							<el-select v-model="editForm.province" placeholder="请选择">
-							    <el-option
-							      v-for="item in options"
-							      :label="item.classifyName"
-							      :value="item.classifyName">
-							    </el-option>
-							  </el-select>
-						</el-form-item>
-						<el-form-item label="市区">
-							<el-select v-model="editForm.city" placeholder="请选择">
-							    <el-option
-							      v-for="item in options"
-							      :label="item.classifyName"
-							      :value="item.classifyId">
-							    </el-option>
-							  </el-select>
-						</el-form-item>
-						<el-form-item label="名称">
-							<el-input v-model="editForm.sName" placeholder="请输入价格" class='myInput'></el-input>
-						</el-form-item>
-						<el-form-item label="详细地址">
-							<el-input v-model="editForm.address" placeholder="请输入内容" class='myInput'></el-input>
-						</el-form-item>
-						<el-form-item label="营业时间">
-							<el-input v-model="editForm.businessHours" placeholder="请输入内容" class='myInput'></el-input>
-						</el-form-item>
-						<el-form-item label='学堂封面'>
-							<el-upload
-							  class="upload-demo"
-							  ref="upload1"
-							  :auto-upload="false"
-							  action="/momingtang/web/backCourse/updateCourse"
-							 >
-							<el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-							<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-							</el-upload>
-						</el-form-item>
-						<el-form-item label='学堂介绍'>
-							<el-upload
-							  class="upload-demo"
-							  ref="upload2"
-							  :auto-upload="false"
-							  action="/momingtang/web/backCourse/updateCourse"
-							 >
-							<el-button slot="trigger" size="small" type="primary">选取图片</el-button>
-							<div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-							</el-upload>
-						</el-form-item>
-						<el-form-item label="课程内容">
-							<el-input v-model="editForm.msg" placeholder="初识古琴"></el-input>
-							<el-input v-model="editForm.msg1" placeholder="琴行"></el-input>
-							<el-input v-model="editForm.msg2" placeholder="哈哈哈"></el-input>
-						</el-form-item>
-					</el-form>
-					<div slot="footer" class="dialog-footer">
-						<el-button @click.native="editFormVisible = false">取消</el-button>
-						<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
-					</div>
-				</el-dialog> -->
-
-		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" name='addForm' action="/momingtang/web/backSchool/addSchool" enctype='multipart/form-data' id='addForm' method='post'>
-				<el-form-item label="归属地" name='attribution'>
-					<select name="province" placeholder="请选择省份">
+		 <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm" name='editForm' action="/momingtang/web/backSchool/updateCourse" enctype='multipart/form-data' id='editForm' method='post'>
+				<el-form-item style='display:none'>
+					<el-input name='sid' v-model='editForm.sid'></el-input>
+				</el-form-item>
+				<el-form-item label="省份">
+					<el-select v-model="editForm.province" disabled @change='getAllCitys' placeholder="请选择">
+					    <el-option
+					      v-for="item in province"
+					      :label="item.name"
+					      :value="item.id">
+					    </el-option>
+					  </el-select>
+				</el-form-item>
+				<el-form-item label="市区">
+					<select name='attribution' disabled :seleted="editForm.city" placeholder="请选择">
 					    <option
-					      v-for="item in options"
-					      :value="item.province">{{item.province}}广州
-					    </option>
-					  </select>
-				<!-- </el-form-item>
-				<el-form-item label="市区" prop='city'> -->
-					<select name="city" placeholder="请选择城市">
-					    <option
-					      v-for="item in options"
-					      :value="item.city">{{item.city}}广州
+					      v-for="item in citys"
+					      :label="item.name"
+					      :value="item.name">
 					    </option>
 					  </select>
 				</el-form-item>
 				<el-form-item label="名称">
-					<el-input name="sName" placeholder="请输入名称" class='myInput'></el-input>
+					<el-input name='sName' v-model="editForm.sName" placeholder="请输入价格" class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label="详细地址">
-					<el-input name="address" placeholder="请输入街道地址" class='myInput'></el-input>
+					<el-input name='address' v-model="editForm.address" placeholder="请输入内容" class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label="营业时间">
-					<el-input name="businessHours" placeholder="请输入时间" class='myInput'></el-input>
+					<el-input name='businessHours' v-model="editForm.businessHours" placeholder="请输入内容" class='myInput'></el-input>
+				</el-form-item>
+				<el-form-item label='学堂封面'>
+					<el-input type='file' name='cover' class='myInput'></el-input>
+				</el-form-item>
+				<el-form-item label='学堂介绍'>
+					<el-input type='file' name='sdetailsPic' class='myInput'></el-input>
+				</el-form-item>
+				<!-- <el-form-item label="课程内容">
+					<el-input v-model="editForm.msg" placeholder="初识古琴"></el-input>
+					<el-input v-model="editForm.msg1" placeholder="琴行"></el-input>
+					<el-input v-model="editForm.msg2" placeholder="哈哈哈"></el-input>
+				</el-form-item> -->
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="editFormVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+			</div>
+		</el-dialog> 
+
+		<!--新增界面-->
+		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
+			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm" name='addForm' action="/momingtang/web/backSchool/addSchool" enctype='multipart/form-data' id='addForm' method='post'>
+				<el-form-item label="省份">
+					<el-select v-model='id' @change='getAllCitys' placeholder="请选择省份">
+					    <el-option
+					      v-for="item in province"
+					      :label='item.name'
+					      :value="item.id">
+					    </el-option>
+					  </el-select>
+				</el-form-item>
+				<el-form-item label="市区">
+					<select name='attribution' class='classifyId' placeholder="请选择城市">
+					    <option
+					      v-for="item in citys"
+					      :value="item.name">{{item.name}}
+					    </option>
+					  </select>
+				</el-form-item>
+				<el-form-item label="名称">
+					<el-input name="sName" v-model='addForm.sName' placeholder="请输入名称" class='myInput'></el-input>
+				</el-form-item>
+				<el-form-item label="详细地址">
+					<el-input name="address" v-model='addForm.address' placeholder="请输入街道地址" class='myInput'></el-input>
+				</el-form-item>
+				<el-form-item label="营业时间">
+					<el-input name="businessHours" v-model='addForm.businessHours' placeholder="请输入时间，如 09:00-18:00" class='myInput'></el-input>
 					<!-- <el-time-picker 
 					    is-range
 					    format='HH:mm'
@@ -145,16 +133,11 @@
 					  </el-time-picker> -->
 				</el-form-item>
 				<el-form-item label='学堂封面'>
-					<input type="file" name='cover'>
+					<el-input type="file" name='cover' class='myInput' v-model='addForm.cover'></el-input>
 				</el-form-item>
 				<el-form-item label="学堂介绍">
-					<input type="file" name='sdetailsPic'>
+					<el-input type="file" name='sdetailsPic' class='myInput' v-model='addForm.sdetailsPic'></el-input>
 				</el-form-item>
-				<!-- <el-form-item label="课程内容">
-					<el-input v-model="addForm.msg" placeholder="第一天课题"></el-input>
-					<el-input v-model="addForm.msg1" placeholder="第二天课题"></el-input>
-					<el-input v-model="addForm.msg2" placeholder="第三天课题"></el-input>
-				</el-form-item> -->
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
@@ -169,8 +152,6 @@
 	import NProgress from 'nprogress'
 	import $ from 'jquery'
 	import '../../jquery-from.js'
-/*	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';*/
-
 	export default {
 		data() {
 			return {
@@ -182,13 +163,17 @@
 				currentPage: 0,
 				pageSize: 10,
 				listLoading: false,
+				pid:0,//获取省份的ID
+				id:1,
 				options:[],
-				sels: [],//列表选中列
+				province:[],
+				citys:[],
+				//sels: [],//列表选中列
 
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					name: [
+					sName: [
 						{ required: true, message: '请输入姓名', trigger: 'blur' }
 					]
 				},
@@ -196,23 +181,24 @@
 				editForm: {
 					sid: 0,
 				    sName: "",
-				    sImage: "",
-				    detailsPic: "",
+				    cover: "",
+				    sdetailsPic: "",
 				    businessHours: "",
 				    address: "",
 				    province: "",
-				    city: ""
+				    city: "",
+				    attribution:''
 				},
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
-					province: [
+					/*province: [
 						{ required: true, message: '请选择省份', trigger: 'blur' }
 					],
 					city: [
 						{ required: true, message: '请选择省份', trigger: 'blur' }
-					],
+					],*/
 					sName: [
 						{ required: true, message: '请输入名称', trigger: 'blur' }
 					]
@@ -221,11 +207,11 @@
 				addForm: {
 					sName: "",
 				    sImage: "",
-				    detailsPic: "",
+				    sdetailsPic: "",
 				    businessHours:'',
 				    address: "",
 				    province: "",
-				    city: ""
+				    attribution: ""
 				}
 
 			}
@@ -235,6 +221,36 @@
 			handleCurrentChange(val) {
 				this.currentPage = val;
 				this.getUsers();
+			},
+			//获取省份
+			getAllProvince(){
+				let para = {
+					pid : this.pid
+				}
+				$.ajax({
+					url: '/momingtang/region/getRegions',
+					type: 'POST',
+					data:para
+				})
+				.done(function(res) {
+					console.log(res);
+					this.province = res.data;
+				}.bind(this))
+			},
+			//获取市区
+			getAllCitys(){
+				let para = {
+					pid : this.id
+				}
+				$.ajax({
+					url: ' /momingtang/region/getRegions',
+					type: 'POST',
+					data:para
+				})
+				.done(function(res) {
+					console.log(res);
+					this.citys = res.data;
+				}.bind(this))
 			},
 			//获取用户列表
 			getUsers() {
@@ -270,7 +286,7 @@
 					NProgress.start();
 					let para = { sid: row.sid };
 					$.ajax({
-						url: `/momingtang/web/backSchool/deleteSchool/${para.sid}`,
+						url: '/momingtang/web/backSchool/deleteSchool',
 						type: 'POST',
 						data: para,
 					})
@@ -300,26 +316,65 @@
 				});
 			},
 			//显示编辑界面
-			/*handleEdit: function (index, row) {
+			handleEdit: function (index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
-			},*/
+			},
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;
-				this.addForm = {
-					sName: "",
-				    sImage: "",
-				    detailsPic: "",
-				    businessHours: '',
-				    address: "",
-				    province: "",
-				    city: ""
-				};
 			},
 			//编辑
-			/*editSubmit: function () {
-				this.$refs.editForm.validate((valid) => {
+			editSubmit: function () {
+				console.log('--------------------------------------开始编辑')
+				var vm = this;
+				console.log(vm.editForm.sid)
+				this.$confirm('确认提交吗？', '提示', {}).then(() => {
+					this.editLoading = true;
+					NProgress.start();
+					$('#editForm').ajaxSubmit({
+						url:'/momingtang/web/backSchool/updateCourse',
+						type:'post',
+						beforeSerialize:function(res){
+							//console.log(res);
+						},
+						beforeSubmit:function(res){
+							//console.log(res)
+						},
+						success: function(res){
+							console.log(res)
+							this.editLoading = false;
+							NProgress.done();
+							if(res.status == 1){
+								this.$notify({
+									title: '成功',
+									message: '提交成功',
+									type: 'success'
+								});
+								vm.$refs.editForm.resetFields();
+							}else{
+								this.$notify({
+									title: '失败',
+									message: '提交失败',
+									type: 'error'
+								});
+							}
+							this.editFormVisible = false;
+							this.getUsers();
+						}.bind(this),
+						error: function(res) {
+							this.editLoading = false;
+							NProgress.done();
+							console.log(res)
+							this.$notify({
+								title: '失败',
+								message: '提交失败',
+								type: 'error'
+							});
+						}.bind(this)
+					})
+				});
+				/*this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
@@ -340,8 +395,8 @@
 							});
 						});
 					}
-				});
-			},*/
+				});*/
+			},
 			//新增
 			addSubmit: function (e) {
 				/*this.$refs.addForm.validate((valid) => {
@@ -366,12 +421,9 @@
 						});
 					}
 				});*/
-				e.preventDefault();
 				this.$confirm('确认提交吗？', '提示', {}).then(() => {
 					this.addLoading = true;
 					NProgress.start();
-					/*let para = $('#addForm').serialize();
-					  console.log(para);*/
 					$('#addForm').ajaxSubmit({
 						url:'/momingtang/web/backSchool/addSchool',
 						type:'post',
@@ -386,21 +438,21 @@
 							this.addLoading = false;
 							NProgress.done();
 							if(res.status == 1){
-									this.$notify({
-										title: '成功',
-										message: '提交成功',
-										type: 'success'
-									});
-									this.$refs['addForm'].resetFields();
-								}else{
-									this.$notify({
-										title: '失败',
-										message: '提交失败',
-										type: 'error'
-									});
-								}
-								this.addFormVisible = false;
-								this.getUsers();
+								this.$notify({
+									title: '成功',
+									message: '提交成功',
+									type: 'success'
+								});
+								this.$refs.addForm.resetFields();
+							}else{
+								this.$notify({
+									title: '失败',
+									message: '提交失败',
+									type: 'error'
+								});
+							}
+							this.addFormVisible = false;
+							this.getUsers();
 						}.bind(this),
 						error: function(res) {
 							this.addLoading = false;
@@ -413,36 +465,12 @@
 						}.bind(this)
 					})
 				})
-			},
-			selsChange: function (sels) {
-				this.sels = sels;
-			},
-			//批量删除
-			batchRemove: function () {
-				var ids = this.sels.map(item => item.id).toString();
-				this.$confirm('确认删除选中记录吗？', '提示', {
-					type: 'warning'
-				}).then(() => {
-					this.listLoading = true;
-					NProgress.start();
-					let para = { ids: ids };
-					batchRemoveUser(para).then((res) => {
-						this.listLoading = false;
-						NProgress.done();
-						this.$notify({
-							title: '成功',
-							message: '删除成功',
-							type: 'success'
-						});
-						this.getUsers();
-					});
-				}).catch(() => {
-
-				});
 			}
 		},
 		mounted() {
 			this.getUsers();
+			this.getAllProvince();
+			this.getAllCitys();
 		}
 	}
 
@@ -450,5 +478,14 @@
 
 <style scoped>
 .myInput{width:218px;}
+.classifyId{
+	width: 218px;
+    height: 36px;
+    border: 1px solid #bfcbd9;
+    border-radius: 4px;
+    color: #333956;
+    padding: 0px 6px;
+    font-size: 14px;
+}
 </style>
 

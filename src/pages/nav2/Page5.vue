@@ -41,7 +41,7 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
+			<el-pagination layout="total, prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
 			</el-pagination>
 		</el-col>
 	</section>
@@ -61,7 +61,7 @@ import $ from 'jquery'
 				users: [],
 				totalPage:0,//总页数
 				currentPage: 0,//当前页
-				pageSize: 20,//每页显示条数
+				pageSize: 10,//每页显示条数
 				listLoading: false,
 
 				//选择时间

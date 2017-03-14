@@ -17,10 +17,10 @@
     </el-col>
 
     <!--列表-->
-    <el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
-      <!-- <el-table :data="users" highlight-current-row v-loading="loading" style="width: 100%;"> -->
-      <el-table-column type="selection" width="40">
-      </el-table-column>
+    <el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%;">
+      <!-- <el-table :data="users" highlight-current-row v-loading="loading" style="width: 100%;"> @selection-change="selsChange"-->
+      <!-- <el-table-column type="selection" width="40">
+      </el-table-column> -->
         <el-table-column type="index" prop='rid' width="60">
         </el-table-column>
         <el-table-column prop="classifyName" label="类型" width="100" sortable>
@@ -45,8 +45,8 @@
 <!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
     <!--工具条-->
     <el-col :span="24" class="toolbar">
-      <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-      <el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="totalPage" style="float:right;">
+      <!-- <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
+      <el-pagination layout="total, prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
       </el-pagination>
     </el-col>
 
@@ -63,47 +63,42 @@
 
     <!--新增界面-->
     <el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-      <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-        <el-form-item label="分类" prop='classifyName'>
-          <el-select v-model="addForm.classifyId" placeholder="请选择">
-              <el-option
+      <el-form :model="addForm" label-width="80px" ref="addForm" name='addForm' action="/momingtang/web/backCourseRelation/addCourseRelation" enctype='multipart/form-data' id='addForm' method='post'>
+        <el-form-item label="分类">
+          <select name='cid' placeholder="请选择" class='classifyId'>
+              <option
                 v-for="item in options"
                 :label="item.classifyName"
                 :value="item.classifyId">
-              </el-option>
-            </el-select>
+              </option>
+            </select>
         </el-form-item>
-        <el-form-item label="名称" prop='courseName'>
-          <el-input v-model="addForm.courseName" placeholder="请输入内容" class='myInput'></el-input>
+        <el-form-item label="老师">
+          <select  name='tid' placeholder="请选择" class='classifyId'> 
+              <option
+                v-for="item in teachers"
+                :label="item.tname"
+                :value="item.tid">
+              </option>
+            </select>
         </el-form-item>
-        <el-form-item label="价格" prop='cPrice'>
-          <el-input v-model="addForm.cPrice" placeholder="请输入价格" class='myInput'></el-input>
-        </el-form-item>
-        <el-form-item label="老师" prop='classifyName'>
-          <el-select v-model="addForm.classifyId" placeholder="请选择">
-              <el-option
-                v-for="item in options"
-                :label="item.classifyName"
-                :value="item.classifyId">
-              </el-option>
-            </el-select>
-        </el-form-item>
-        <el-form-item label="学堂" prop='classifyName'>
-          <el-select v-model="addForm.classifyId" placeholder="请选择">
-              <el-option
-                v-for="item in options"
-                :label="item.classifyName"
-                :value="item.classifyId">
-              </el-option>
-            </el-select>
+        <el-form-item label="学堂">
+          <select name='sid' placeholder="请选择" class='classifyId'>
+              <option
+                v-for="item in schools"
+                :label="item.sName"
+                :value="item.sid">
+              </option>
+            </select>
         </el-form-item>
         <el-form-item label="授课时间">
-          <el-date-picker
+          <el-input name='dates' placeholder="请输入时间范围，例3.20-3.22" class='myInput'></el-input>
+          <!-- <el-date-picker
             v-model="addForm.bespeakTime"
             type="date"
             placeholder="选择日期"
             :picker-options="pickerOptions0">
-          </el-date-picker>
+          </el-date-picker> -->
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -117,8 +112,8 @@
 <script>
   import util from '../../common/js/util'
   import NProgress from 'nprogress'
-  import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
   import $ from 'jquery'
+  import '../../jquery-from.js'
   export default {
     data() {
       return {
@@ -130,8 +125,10 @@
         currentPage: 0,
         pageSize: 10,
         listLoading: false,
-        options:[],
+        options:[],//分类信息
         sels: [],//列表选中列
+        teachers:[],//所有老师
+        schools:[],//所有学堂
 /*
         editFormVisible: false,//编辑界面是否显示
         editLoading: false,
@@ -170,7 +167,40 @@
       }
     },
     methods: {
-      //性别显示转换
+      //获取新增数据分类
+      getAllClassify(){
+        $.ajax({
+          url: '/momingtang/web/backCourse/getAllClassify',
+          type: 'POST',
+        })
+        .done(function(res) {
+          console.log(res);
+          this.options = res.data;
+        }.bind(this))
+      },
+      //获取全部的老师
+      getTeachers() {
+        $.ajax({
+          url: '/momingtang/web/backTeacher/getAllTeacher',
+          type: 'POST',
+        })
+        .done(function(res) {
+          console.log(res);
+          this.teachers = res.data;
+        }.bind(this))
+      },
+      //获取全部的学堂
+      getSchools() {
+        $.ajax({
+          url: '/momingtang/web/backSchool/getAllSchool',
+          type: 'POST',
+        })
+        .done(function(res) {
+          console.log(res);
+          this.schools = res.data;
+        }.bind(this))
+      },
+      //分页展示
       handleCurrentChange(val) {
         this.currentPage = val;
         this.getUsers();
@@ -289,7 +319,52 @@
       },*/
       //新增
       addSubmit: function () {
-        this.$refs.addForm.validate((valid) => {
+        var vm = this;
+        this.$confirm('确认提交吗？', '提示', {}).then(() => {
+          this.addLoading = true;
+          NProgress.start();
+          $('#addForm').ajaxSubmit({
+            url:'/momingtang/web/backCourseRelation/addCourseRelation',
+            type:'post',
+            beforeSerialize:function(res){
+              console.log(res)
+            },
+            beforeSubmit:function(res){
+              //console.log(res)
+            },
+            success: function(res){
+              console.log(res)
+              this.addLoading = false;
+              NProgress.done();
+              if(res.status == 1){
+                  this.$notify({
+                    title: '成功',
+                    message: '提交成功',
+                    type: 'success'
+                  });
+                  vm.$refs['addForm'].resetFields();
+                }else{
+                  this.$notify({
+                    title: '失败',
+                    message: '提交失败',
+                    type: 'error'
+                  });
+                }
+                this.addFormVisible = false;
+                this.getUsers();
+            }.bind(this),
+            error: function(res) {
+              this.addLoading = false;
+              NProgress.done();
+              this.$notify({
+                title: '失败',
+                message: '提交失败',
+                type: 'error'
+              });
+            }.bind(this)
+          })
+        })
+        /*this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
@@ -328,7 +403,7 @@
               })
               .always(function() {
                 console.log("complete");
-              });
+              });*/
               
               /*addUser(para).then((res) => {
                 this.addLoading = false;
@@ -342,11 +417,11 @@
                 this.addFormVisible = false;
                 this.getUsers();
               });*/
-            });
+        /*    });
           }
-        });
+        });*/
       },
-      selsChange: function (sels) {
+      /*selsChange: function (sels) {
         this.sels = sels;
       },
       //批量删除
@@ -371,10 +446,13 @@
         }).catch(() => {
 
         });
-      }
+      }*/
     },
     mounted() {
       this.getUsers();
+      this.getAllClassify();
+      this.getTeachers();
+      this.getSchools();
     }
   }
 
@@ -382,5 +460,14 @@
 
 <style scoped>
 .myInput{width:218px;}
+.classifyId{
+  width: 218px;
+    height: 36px;
+    border: 1px solid #bfcbd9;
+    border-radius: 4px;
+    color: #959ac1;
+    padding: 0px 6px;
+    font-size: 14px;
+}
 </style>
 

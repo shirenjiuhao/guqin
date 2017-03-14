@@ -17,10 +17,10 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%">
-			<!-- <el-table :data="users" highlight-current-row v-loading="loading" style="width: 100%;"> -->
-			<el-table-column type="selection" width="50">
-			</el-table-column>
+		<el-table :data="users" highlight-current-row v-loading="listLoading" style="width: 100%">
+			<!-- <el-table :data="users" highlight-current-row v-loading="loading" style="width: 100%;">@selection-change="selsChange"  -->
+			<!-- <el-table-column type="selection" width="50">
+			</el-table-column> -->
 				<el-table-column type="index" prop='tid' width="100">
 				</el-table-column>
 				<el-table-column prop="tname" label="名字" width="200" sortable>
@@ -33,9 +33,10 @@
 				</el-table-column>
 				<el-table-column prop="birth" label="从业时间" min-width="160" sortable>
 				</el-table-column> 
-			<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
+			-->
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
+					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
@@ -43,45 +44,40 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
+			<!-- <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
 			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="totalPage" style="float:right;">
 			</el-pagination>
 		</el-col>
 
 		<!--编辑界面-->
-		<!-- <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="名字" prop="tName">
-					<el-input v-model="addForm.tName" auto-complete="off" class='myInput'></el-input>
+		 <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+			<el-form :model="editForm" label-width="80px" ref="editForm" name='editForm' action="/momingtang/web/backTeacher/updateTeacher" enctype='multipart/form-data' id='editForm' method='post'>
+				<el-form-item style='display:none'>
+					<el-input name='tid' v-model='editForm.tid'></el-input>
+				</el-form-item>
+				<el-form-item label="名字">
+					<el-input name='tname' v-model="editForm.tname" auto-complete="off" class='myInput'></el-input>
 				</el-form-item>
 				
 				<el-form-item label="描述">
-					<el-input v-model="addForm.introduce" class='myInput'></el-input>
+					<el-input name='introduce' v-model="editForm.introduce" class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label="教师图片">
-					<el-upload
-					  class="upload-demo"
-					  action="/momingtang/web/backTeacher/addTeacher"
-					  ref="upload"
-					  :auto-upload="false"
-					  >
-					  <el-button size="small" type="primary">点击上传</el-button>
-					  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-					</el-upload>
+					<el-input type='file' name='cover' class='myInput'></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="editFormVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
 			</div>
-		</el-dialog>  -->
+		</el-dialog>  
 
 		<!--新增界面-->
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" ref="addForm"
 			name='addForm' action="/momingtang/web/backTeacher/addTeacher" enctype='multipart/form-data' id='addForm' method='post'>
 				<el-form-item label="名字">
-					<el-input name="tName" auto-complete="off" class='myInput'></el-input>
+					<el-input name="tname" auto-complete="off" class='myInput'></el-input>
 				</el-form-item>
 				
 				<el-form-item label="描述">
@@ -120,31 +116,30 @@
 				editFormVisible: false,//编辑界面是否显示
 				editLoading: false,
 				editFormRules: {
-					tName: [
+					/*tName: [
 						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					]
+					]*/
 				},
 				//编辑界面数据
 				editForm: {
-					id: 0,
 					tid: 0,
 				    tname: "",
 				    introduce: "",
-				    timage: ""
+				    cover: ""
 				},
 
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
-					tName: [
+					tname: [
 						{ required: true, message: '请输入姓名', trigger: 'blur' }
 					]
 				},
 				//新增界面数据
 				addForm: {
-				    tName: "",
+				    tname: "",
 				    introduce: "",
-				    cover: {}
+				    cover: ''
 				}
 
 			}
@@ -192,7 +187,7 @@
 					NProgress.start();
 					let para = { tid: row.tid };
 					$.ajax({
-						url: `/momingtang/web/backTeacher/deleteTeacher/${para.tid}`,
+						url: '/momingtang/web/backTeacher/deleteTeacher',
 						type: 'POST',
 						data: para,
 					})
@@ -234,14 +229,60 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					tName: '',
+					tname: '',
 					introduce: '',
 					cover: '',
 				};
 			},
 			//编辑
-			/*editSubmit: function () {
-				this.$refs.editForm.validate((valid) => {
+			editSubmit: function () {
+				var vm = this;
+				console.log(vm.editForm.tid)
+				this.$confirm('确认提交吗？', '提示', {}).then(() => {
+					this.editLoading = true;
+					NProgress.start();
+					$('#editForm').ajaxSubmit({
+						url:'/momingtang/web/backTeacher/updateTeacher',
+						type:'post',
+						beforeSerialize:function(res){
+							//console.log(res);
+						},
+						beforeSubmit:function(res){
+							//console.log(res)
+						},
+						success: function(res){
+							console.log(res)
+							this.editLoading = false;
+							NProgress.done();
+							if(res.status == 1){
+								this.$notify({
+									title: '成功',
+									message: '提交成功',
+									type: 'success'
+								});
+							}else{
+								this.$notify({
+									title: '失败',
+									message: '提交失败',
+									type: 'error'
+								});
+							}
+							this.editFormVisible = false;
+							this.getUsers();
+						}.bind(this),
+						error: function(res) {
+							this.editLoading = false;
+							NProgress.done();
+							console.log(res)
+							this.$notify({
+								title: '失败',
+								message: '提交失败',
+								type: 'error'
+							});
+						}.bind(this)
+					})
+				});
+				/*this.$refs.editForm.validate((valid) => {
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
@@ -262,68 +303,10 @@
 							});
 						});
 					}
-				});
-			},*/
-			//新增
-			addSubmit: function (e) {
-				/*this.$refs.addForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.addLoading = true;
-							this.addForm.cover = Object.assign({}, this.$refs.upload.uploadFiles[0].raw);
-							console.log(typeof this.$refs.upload.uploadFiles[0].raw)
-							NProgress.start();
-							let para = Object.assign({}, this.addForm);
-							console.log(para)
-							$.ajax({
-								url: '/momingtang/web/backTeacher/addTeacher',
-								type: 'POST',
-								data: para,
-							})
-							.done(function(res) {
-								console.log("success");
-								this.addLoading = false;
-								NProgress.done();
-								if(res.status ==1){
-									this.$notify({
-										title: '成功',
-										message: '提交成功',
-										type: 'success'
-									});
-								this.$refs['addForm'].resetFields();
-								}else{
-									this.$notify({
-										title: '失败',
-										message: '提交失败',
-										type: 'success'
-									});
-								}
-								this.addFormVisible = false;
-								this.getUsers();
-							})
-							.fail(function() {
-								console.log("error");
-							})
-							.always(function() {
-								console.log("complete");
-							});
-							
-							/*addUser(para).then((res) => {
-								this.addLoading = false;
-								NProgress.done();
-								this.$notify({
-									title: '成功',
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['addForm'].resetFields();
-								this.addFormVisible = false;
-								this.getUsers();
-							});
-						});
-					}
 				});*/
-				e.preventDefault();
+			},
+			//新增
+			addSubmit: function () {
 				this.$confirm('确认提交吗？', '提示', {}).then(() => {
 					this.addLoading = true;
 					NProgress.start();
@@ -333,10 +316,10 @@
 						url:'/momingtang/web/backTeacher/addTeacher',
 						type:'post',
 						beforeSerialize:function(res){
-							console.log(res)
+							//console.log(res)
 						},
 						beforeSubmit:function(res){
-							console.log(res)
+							//console.log(res)
 						},
 						success: function(res){
 							console.log(res)
@@ -372,7 +355,7 @@
 					})
 				})
 			},
-			selsChange: function (sels) {
+			/*selsChange: function (sels) {
 				this.sels = sels;
 			},
 			//批量删除
@@ -397,7 +380,7 @@
 				}).catch(() => {
 
 				});
-			}
+			}*/
 		},
 		mounted() {
 			this.getUsers();

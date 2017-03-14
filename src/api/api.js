@@ -1,4 +1,4 @@
-import axios from 'axios';
+/*import axios from 'axios';*/
 import $ from 'jquery'
 let base = '';
 
@@ -17,4 +17,3 @@ export const editUser = params => { return axios.get(`${base}/user/edit`, { para
 export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };*/
 export const requestLogin = params => { return $.post(`${base}/momingtang/backUser/login`, params)};//登录
 export const requestLogout = params => { return $.post(`${base}/momingtang/backUser/logout`, params)};//退出
-export const getUserListPage = params => { return $.post(`${base}/user/listpage`, params )};

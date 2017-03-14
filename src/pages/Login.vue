@@ -96,7 +96,7 @@
               } else {
                 _this.$router.params = res.data;
                 sessionStorage.setItem('user', JSON.stringify(loginParams));
-                _this.$router.push({ path: '/course' });
+                _this.$router.replace({ path: '/course' });
               }   
             });
           } else {
