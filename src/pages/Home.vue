@@ -1,15 +1,12 @@
 <template>
 	<el-row class="container">
 		<el-col :span="24" class="header">
-			<el-col :span="10" class="logo">
+			<el-col :span="20" class="logo">
 				<span class='mytitle'>古琴后台</span>
-			</el-col>
-			<el-col :span="10">
-				<div id='showTime' style='color:#c0ccda'></div>
 			</el-col>
 			<el-col :span="4" class="userinfo">
 				<el-dropdown trigger="click">
-					<span class="el-dropdown-link userinfo-inner"><img src="../assets/user.png" /> <!-- {{this.$router.params.username}} -->advance</span>
+					<span class="el-dropdown-link userinfo-inner"><img src="../assets/user.png" /> {{sysUserName}} </span>
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item>我的消息</el-dropdown-item>
 						<el-dropdown-item>设置</el-dropdown-item>

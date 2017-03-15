@@ -18,7 +18,7 @@
 <script>
   import { requestLogin } from '../api/api';
   import NProgress from 'nprogress'
-  import $ from 'jquery'
+  
   export default {
     data() {
       return {
@@ -52,35 +52,6 @@
             this.logining = true;
             NProgress.start();
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-            /*$.ajax({
-              url: '/momingtang/backUser/login',
-              type: 'POST',
-              data: loginParams,
-            })
-            .done(function(res) {
-              console.log(res);
-               _this.logining = false;
-                NProgress.done();
-                let code = res.status;
-                if (code !== 1) {
-                _this.$notify({
-                  title: '错误',
-                  message: res.message,
-                  type: 'error'
-                });
-              } else {
-                _this.$router.params = res.data;
-                sessionStorage.setItem('user', JSON.stringify(loginParams));
-                _this.$router.push({ path: '/course' });
-              }   
-            })
-            .fail(function(err) {
-              console.log(err);
-            })
-            .always(function() {
-              console.log("complete");
-            });*/
-            
             requestLogin(loginParams).then(res => {
               NProgress.done();
               console.log(res);
@@ -97,6 +68,7 @@
                 _this.$router.params = res.data;
                 sessionStorage.setItem('user', JSON.stringify(loginParams));
                 _this.$router.replace({ path: '/course' });
+                showTime();
               }   
             });
           } else {
