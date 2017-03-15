@@ -63,11 +63,10 @@
 					  </el-select>
 				</el-form-item>
 				<el-form-item label="市区">
-					<select name='attribution' disabled :seleted="editForm.city" placeholder="请选择">
+					<select name='attribution' class='classifyId' disabled placeholder="请选择">
 					    <option
-					      v-for="item in citys"
-					      :label="item.name"
-					      :value="item.name">
+					      :label='editForm.city'
+					      :value="editForm.city">
 					    </option>
 					  </select>
 				</el-form-item>
@@ -255,7 +254,6 @@
 			//获取用户列表
 			getUsers() {
 				let para = {
-					totalPage:this.totalPage,
 					currentPage: this.currentPage,
 					pageSize: this.pageSize,
 					name: this.filters.name
@@ -269,7 +267,7 @@
 				})
 				.done(function(res) {
 					console.log(res);
-					this.totalPage = res.data.totalPage;
+					this.totalPage = res.data.totalRecord;
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;

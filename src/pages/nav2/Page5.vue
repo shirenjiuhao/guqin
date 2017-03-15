@@ -41,7 +41,7 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-pagination layout="total, prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
+			<el-pagination layout="total, prev, pager, next" @current-change="handleCurrentChange" :total="totalPage" :page-size="pageSize" style="float:right;">
 			</el-pagination>
 		</el-col>
 	</section>
@@ -50,8 +50,7 @@
 <script>
 	import util from '../../common/js/util'
 	import NProgress from 'nprogress'
-	import { getUserListPage } from '../../api/api';
-import $ from 'jquery'
+	import $ from 'jquery'
 	export default {
 		data() {
 			return {
@@ -101,7 +100,6 @@ import $ from 'jquery'
 				this.filters.name = (!this.filters.name || this.filters.name == '') ? '' : util.formatDate.format(new Date(this.filters.name), 'yyyy-MM-dd');
 				console.log(typeof this.filters.name);
 				let para = {
-					totalPage:this.totalPage,
 					currentPage: this.currentPage,
 					pageSize: this.pageSize,
 					date: this.filters.name,
@@ -117,7 +115,7 @@ import $ from 'jquery'
 				  console.log(res);
 				  NProgress.done();
 				  if(res.status == 1){
-				  	this.totalPage = res.data.totalPage;
+				  	this.totalPage = res.data.totalRecord;
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;

@@ -134,7 +134,7 @@
 				users: [],
 				totalPage: 0,//总页数
 				currentPage:1,//当前页
-				pageSize:20,//页大小
+				pageSize:10,//页大小
 				listLoading: false,
 				//sels: [],//列表选中列
 
@@ -194,7 +194,6 @@
 			//获取用户列表
 			getUsers() {
 				let para = {
-					currentPage: this.page,
 					classifyName: this.filters.classifyName,
 					currentPage: this.currentPage,
 					pageSize: this.pageSize
@@ -208,7 +207,7 @@
 				})
 				.done(function(res) {
 					console.log(res);
-					this.totalPage = res.data.totalPage;
+					this.totalPage = res.data.totalRecord;
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;

@@ -37,12 +37,11 @@
         </el-table-column>
       <el-table-column label="操作" width="140">
         <template scope="scope">
-          
+          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
-<!-- <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button> -->
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <!-- <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
@@ -51,48 +50,99 @@
     </el-col>
 
     <!--编辑界面-->
-  <!--   <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
+  <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
     <el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-      
+      <el-form-item label="分类">
+          <el-select placeholder="请选择" disabled v-model='editForm.classifyName' >
+              <el-option
+                v-for="item in options"
+                :label="item.classifyName"
+                :value="item.classifyId">
+              </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="价格">
+          <el-input placeholder="请输入价格" :disabled="true" v-model='editForm.cPrice' class='myInput'></el-input>  
+        </el-form-item>
+        <el-form-item label="名称">
+          <el-input placeholder="请输入名称" v-model='editForm.courseName' class='myInput'></el-input>  
+        </el-form-item>
+        <el-form-item label="老师">
+          <el-select placeholder="请选择" disabled v-model='editForm.tname'> 
+              <el-option
+                v-for="item in teachers"
+                :label="item.tname"
+                :value="item.tid">
+              </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="学堂">
+          <el-select placeholder="请选择" disabled v-model='editForm.sName'>
+              <el-option
+                v-for="item in schools"
+                :label="item.sName"
+                :value="item.sid">
+              </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="授课时间" prop='time'>
+          <el-input placeholder="请选择时间" v-model='editForm.bespeakTime' class='myInput'></el-input>
+            <!-- <el-col :span="11">
+              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.date1" style="width: 100%;"></el-date-picker>
+            </el-col>
+            <el-col class="line" :span="2">-</el-col>
+            <el-col :span="11">
+              <el-time-picker type="fixed-time" placeholder="选择时间" v-model="editForm.date2" style="width: 100%;"></el-time-picker>
+            </el-col> -->
+         <!--  <el-date-picker
+           v-model="editForm.bespeakTime"
+           type="daterange"
+           format='MM.dd'
+           placeholder="选择日期范围">
+         </el-date-picker> -->
+        </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click.native="editFormVisible = false">取消</el-button>
       <el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
     </div>
-  </el-dialog> -->
+  </el-dialog>
 
     <!--新增界面-->
     <el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-      <el-form :model="addForm" label-width="80px" ref="addForm" name='addForm' action="/momingtang/web/backCourseRelation/addCourseRelation" enctype='multipart/form-data' id='addForm' method='post'>
+      <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
         <el-form-item label="分类">
-          <select name='cid' placeholder="请选择" class='classifyId'>
-              <option
+          <el-select v-model='addForm.cid' placeholder="请选择" >
+              <el-option
                 v-for="item in options"
                 :label="item.classifyName"
                 :value="item.classifyId">
-              </option>
-            </select>
+              </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="名称" prop='name'>
+          <el-input v-model='addForm.courseName' placeholder="请输入名称" class='myInput'></el-input>  
         </el-form-item>
         <el-form-item label="老师">
-          <select  name='tid' placeholder="请选择" class='classifyId'> 
-              <option
+          <el-select  v-model='addForm.tid' placeholder="请选择" > 
+              <el-option
                 v-for="item in teachers"
                 :label="item.tname"
                 :value="item.tid">
-              </option>
-            </select>
+              </el-option>
+            </el-select>
         </el-form-item>
         <el-form-item label="学堂">
-          <select name='sid' placeholder="请选择" class='classifyId'>
-              <option
+          <el-select v-model='addForm.sid' placeholder="请选择" >
+              <el-option
                 v-for="item in schools"
                 :label="item.sName"
                 :value="item.sid">
-              </option>
-            </select>
+              </el-option>
+            </el-select>
         </el-form-item>
         <el-form-item label="授课时间">
-          <el-input name='dates' placeholder="请输入时间范围，例3.20-3.22" class='myInput'></el-input>
+          <el-input v-model='addForm.dates' placeholder="请输入时间范围，例3.20-3.22" class='myInput'></el-input>
           <!-- <el-date-picker
             v-model="addForm.bespeakTime"
             type="date"
@@ -129,18 +179,25 @@
         sels: [],//列表选中列
         teachers:[],//所有老师
         schools:[],//所有学堂
-/*
+
         editFormVisible: false,//编辑界面是否显示
         editLoading: false,
         editFormRules: {
-          name: [
-            { required: true, message: '请输入姓名', trigger: 'blur' }
+          time: [
+            { required: false, message: '请输入时间', trigger: 'blur' }
           ]
-        },*/
+        },
         //编辑界面数据
-        /*editForm: {
-          
-        },*/
+        editForm: {
+          classifyId:'',
+          classifyName:'',
+          courseName:'',
+          cPrice:'',
+          tname:'',
+          sName:'',
+          timeId:'',
+          bespeakTime:''
+        },
         pickerOptions0: {
           disabledDate(time) {
             return time.getTime() < Date.now() - 8.64e7;
@@ -149,19 +206,19 @@
         addFormVisible: false,//新增界面是否显示
         addLoading: false,
         addFormRules: {
+          //验证规则
           name: [
-            { required: true, message: '请输入姓名', trigger: 'blur' }
+            { required: false, message: '请输入姓名', trigger: 'blur' }
           ]
         },
         //新增界面数据
         addForm: {
-          classifyId:'',
-          classifyName:'',
+          cid:'',
           courseName:'',
-          cPrice:'',
-          tname:'',
-          sName:'',
-          bespeakTime:[]
+          tid:'',
+          sid:'',
+          dates:''
+          
         }
 
       }
@@ -174,7 +231,7 @@
           type: 'POST',
         })
         .done(function(res) {
-          console.log(res);
+         // console.log(res);
           this.options = res.data;
         }.bind(this))
       },
@@ -185,7 +242,7 @@
           type: 'POST',
         })
         .done(function(res) {
-          console.log(res);
+         // console.log(res);
           this.teachers = res.data;
         }.bind(this))
       },
@@ -196,7 +253,7 @@
           type: 'POST',
         })
         .done(function(res) {
-          console.log(res);
+         // console.log(res);
           this.schools = res.data;
         }.bind(this))
       },
@@ -208,10 +265,9 @@
       //获取用户列表
       getUsers() {
         let para = {
-          totalPage:this.totalPage,
           currentPage: this.currentPage,
           pageSize: this.pageSize,
-          name: this.filters.name
+          //name: this.filters.name
         };
         this.listLoading = true;
         NProgress.start();
@@ -222,7 +278,7 @@
         })
         .done(function(res) {
           console.log(res);
-          this.totalPage = res.data.totalPage;
+          this.totalPage = res.data.totalRecord;
           this.currentPage = res.data.currentPage;
           this.pageSize = res.data.pageSize;
           this.users = res.data.datas;
@@ -237,7 +293,8 @@
         }).then(() => {
           this.listLoading = true;
           NProgress.start();
-          let para = { rid: row.rid };
+          //console.log(row);
+          let para = { timeId: row.timeId };
          $.ajax({
             url:  '/momingtang/web/backCourseRelation/deleteCourseRelationTime',
             type: 'POST',
@@ -262,115 +319,81 @@
             }
             this.getUsers();
           }.bind(this))
-          .fail(function() {
-            console.log("error");
-            this.listLoading = false;
-            NProgress.done();
-          })
-          .always(function() {
-            console.log("complete");
-          });
         }).catch(() => {
 
         });
       },
       //显示编辑界面
-     /* handleEdit: function (index, row) {
+      handleEdit: function (index, row) {
         this.editFormVisible = true;
+        /*let dates = row.bespeakTime.split('-')
+        console.log(dates)
+        for (let i in dates) {
+          console.log(i);
+         this.editForm.date[i] = dates[i]
+        };*/
         this.editForm = Object.assign({}, row);
-      },*/
+        console.log(row)
+      },
       //显示新增界面
       handleAdd: function () {
         this.addFormVisible = true;
         this.addForm = {
-          classifyId:'',
-          classifyName:'',
+          cid:'',
           courseName:'',
-          cPrice:'',
-          tname:'',
-          sName:'',
-          bespeakTime:[]
+          tid:'',
+          sid:'',
+          dates:''
         };
       },
       //编辑
-      /*editSubmit: function () {
+      editSubmit: function () {
         this.$refs.editForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.editLoading = true;
               NProgress.start();
               let para = Object.assign({}, this.editForm);
-              para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-              editUser(para).then((res) => {
+             /* para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');*/
+              $.ajax({
+                url: '/momingtang/web/backCourseRelation/updateCourseRelationTime',
+                type: 'POST',
+                data: para,
+              })
+              .done(function(res) {
+                console.log("success");
                 this.editLoading = false;
                 NProgress.done();
-                this.$notify({
-                  title: '成功',
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['editForm'].resetFields();
-                this.editFormVisible = false;
-                this.getUsers();
-              });
-            });
-          }
-        });
-      },*/
-      //新增
-      addSubmit: function () {
-        var vm = this;
-        this.$confirm('确认提交吗？', '提示', {}).then(() => {
-          this.addLoading = true;
-          NProgress.start();
-          $('#addForm').ajaxSubmit({
-            url:'/momingtang/web/backCourseRelation/addCourseRelation',
-            type:'post',
-            beforeSerialize:function(res){
-              console.log(res)
-            },
-            beforeSubmit:function(res){
-              //console.log(res)
-            },
-            success: function(res){
-              console.log(res)
-              this.addLoading = false;
-              NProgress.done();
-              if(res.status == 1){
+                if(res.status ==1){
                   this.$notify({
                     title: '成功',
                     message: '提交成功',
                     type: 'success'
                   });
-                  vm.$refs['addForm'].resetFields();
+                  this.$refs['editForm'].resetFields();
+                  this.getUsers();
                 }else{
                   this.$notify({
                     title: '失败',
-                    message: '提交失败',
+                    message: '提交成功',
                     type: 'error'
                   });
                 }
-                this.addFormVisible = false;
-                this.getUsers();
-            }.bind(this),
-            error: function(res) {
-              this.addLoading = false;
-              NProgress.done();
-              this.$notify({
-                title: '失败',
-                message: '提交失败',
-                type: 'error'
-              });
-            }.bind(this)
-          })
-        })
-        /*this.$refs.addForm.validate((valid) => {
+                this.editFormVisible = false;
+              }.bind(this))
+            });
+          }
+        });
+      },
+      //新增
+      addSubmit: function () {
+        this.$refs.addForm.validate((valid) => {
           if (valid) {
             this.$confirm('确认提交吗？', '提示', {}).then(() => {
               this.addLoading = true;
               NProgress.start();
               let para = Object.assign({}, this.addForm);
-              para.bespeakTime = (!para.bespeakTime || para.bespeakTime == '') ? '' : util.formatDate.format(new Date(para.bespeakTime), 'MM-dd');
+             /* para.bespeakTime = (!para.bespeakTime || para.bespeakTime == '') ? '' : util.formatDate.format(new Date(para.bespeakTime), 'MM-dd');*/
               $.ajax({
                 url: '/momingtang/web/backCourseRelation/addCourseRelation',
                 type: 'POST',
@@ -386,6 +409,7 @@
                     message: '提交成功',
                     type: 'success'
                   });
+                  this.getUsers();
                   this.$refs['addForm'].resetFields();
                 }else{
                   this.$notify({
@@ -394,32 +418,11 @@
                     type: 'error'
                   });
                 }
-                
                 this.addFormVisible = false;
-                this.getUsers();
-              })
-              .fail(function() {
-                console.log("error");
-              })
-              .always(function() {
-                console.log("complete");
-              });*/
-              
-              /*addUser(para).then((res) => {
-                this.addLoading = false;
-                NProgress.done();
-                this.$notify({
-                  title: '成功',
-                  message: '提交成功',
-                  type: 'success'
-                });
-                this.$refs['addForm'].resetFields();
-                this.addFormVisible = false;
-                this.getUsers();
-              });*/
-        /*    });
+              }.bind(this))
+            });
           }
-        });*/
+        });
       },
       /*selsChange: function (sels) {
         this.sels = sels;

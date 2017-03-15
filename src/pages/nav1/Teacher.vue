@@ -45,7 +45,7 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
 			<!-- <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button> -->
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="totalPage" style="float:right;">
+			<el-pagination layout="total, prev, pager, next" @current-change="handleCurrentChange" :page-size="pageSize" :total="totalPage" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -109,7 +109,7 @@
 				users: [],
 				totalPage: 0,
 				currentPage: 0,
-				pageSize: 20,
+				pageSize: 10,
 				listLoading: false,
 				sels: [],//列表选中列
 
@@ -156,7 +156,6 @@
 			//获取用户列表
 			getUsers() {
 				let para = {
-					totalPage: this.totalPage,
 					currentPage: this.currentPage,
 					pageSize: this.pageSize,
 					name: this.filters.name
@@ -170,7 +169,7 @@
 				})
 				.done(function(res) {
 					console.log(res);
-					this.totalPage = res.data.totalPage;
+					this.totalPage = res.data.totalRecord;
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;
