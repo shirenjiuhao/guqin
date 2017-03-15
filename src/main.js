@@ -16,7 +16,7 @@ import 'font-awesome/css/font-awesome.min.css'
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
-Vue.use(require('./showDate.js'))
+/*Vue.use(require('./showDate.js'))*/
 
 NProgress.configure({ showSpinner: false });
 

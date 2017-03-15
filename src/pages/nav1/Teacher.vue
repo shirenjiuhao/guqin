@@ -84,7 +84,7 @@
 					<el-input name="introduce" class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label="教师图片">
-					<input type="file" name='cover'>
+					<el-input type="file" name='cover' class='myInput'></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">

@@ -21,11 +21,13 @@
 			</el-table-column> -->
 			<el-table-column type="index" prop='cid' width="80">
 			</el-table-column>
-			<el-table-column prop="courseName" label="名称" width="220" sortable>
+			<el-table-column prop="courseName" label="名称" width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="classifyName" label="分类" min-width="220" sortable>
+			<el-table-column prop="classifyName" label="分类" min-width="120" sortable>
 			</el-table-column>
-			<el-table-column prop="cPrice" label="价格" width="200" sortable>
+			<el-table-column prop="summary" label="描述" min-width="200" sortable>
+			</el-table-column>
+			<el-table-column prop="cPrice" label="价格" width="150" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
@@ -64,11 +66,14 @@
 				<el-form-item label="名称">
 					<el-input name="courseName" v-model='editForm.courseName' placeholder="请输入内容" class='myInput'></el-input>
 				</el-form-item>
+				<el-form-item label="描述">
+					<el-input name="summary" v-model='editForm.summary' placeholder="请输入描述" class='myInput'></el-input>
+				</el-form-item>
 				<el-form-item label='背景图片'>
-					<el-input type="file" name='cover' v-model='editForm.cover'></el-input>
+					<el-input type="file" name='cover' v-model='editForm.cover' class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label='课程详情'>
-					<el-input type="file" name='detailsPic' v-model='editForm.detailsPic'></el-input>
+					<el-input type="file" name='detailsPic' v-model='editForm.detailsPic' class='myInput'></el-input>
 				</el-form-item>
 				<!-- <el-form-item label="课程内容">
 					<el-input v-model="editForm.msg" placeholder="初识古琴"></el-input>
@@ -100,11 +105,14 @@
 				<el-form-item label="价格">
 					<el-input name='cPrice' placeholder="请输入价格" class='myInput'></el-input>
 				</el-form-item>
+				<el-form-item label="描述">
+					<el-input name='summary' placeholder="请输入描述，30-50个字" class='myInput'></el-input>
+				</el-form-item>
 				<el-form-item label='背景图片'>
-					<input type='file' name='cover'/>
+					<el-input type='file' name='cover' class='myInput'></el-input>
 				</el-form-item>
 				<el-form-item label="课程介绍">
-					<input type="file" name='detailsPic'>
+					<el-input type="file" name='detailsPic' class='myInput'></el-input>
 				</el-form-item>
 				<!-- <el-form-item label="课程内容">
 					<el-input v-model="addForm.msg" placeholder="第一天课题"></el-input>
@@ -156,6 +164,7 @@
 					cid: 0,
 					courseName: '',
 					classifyName: '',
+					summary:'',
 					cPrice:'',
 					cover:'',
 					detailsPic:''
@@ -180,6 +189,7 @@
 					courseName: '',//名称
 					classifyName: '',
 					cPrice:'',
+					summary:'',
 					classifyId:'',//课程分类ID
 				}
 

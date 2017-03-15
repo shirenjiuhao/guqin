@@ -87,13 +87,7 @@
         </el-form-item>
         <el-form-item label="授课时间" prop='time'>
           <el-input placeholder="请选择时间" v-model='editForm.bespeakTime' class='myInput'></el-input>
-            <!-- <el-col :span="11">
-              <el-date-picker type="date" placeholder="选择日期" v-model="editForm.date1" style="width: 100%;"></el-date-picker>
-            </el-col>
-            <el-col class="line" :span="2">-</el-col>
-            <el-col :span="11">
-              <el-time-picker type="fixed-time" placeholder="选择时间" v-model="editForm.date2" style="width: 100%;"></el-time-picker>
-            </el-col> -->
+            
          <!--  <el-date-picker
            v-model="editForm.bespeakTime"
            type="daterange"
@@ -112,7 +106,7 @@
     <el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
       <el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
         <el-form-item label="分类">
-          <el-select v-model='addForm.cid' placeholder="请选择" >
+          <el-select v-model='classifyId' placeholder="请选择" @change='getAllClass'>
               <el-option
                 v-for="item in options"
                 :label="item.classifyName"
@@ -120,8 +114,15 @@
               </el-option>
             </el-select>
         </el-form-item>
-        <el-form-item label="名称" prop='name'>
-          <el-input v-model='addForm.courseName' placeholder="请输入名称" class='myInput'></el-input>  
+        <el-form-item label="名称" prop='cid'>
+          <!-- <el-input v-model='addForm.courseName' placeholder="请输入名称" class='myInput'></el-input> -->
+          <el-select v-model='addForm.cid' placeholder="请选择" >
+              <el-option
+                v-for="item in sels"
+                :label="item.courseName"
+                :value="item.cid">
+              </el-option>
+            </el-select>  
         </el-form-item>
         <el-form-item label="老师">
           <el-select  v-model='addForm.tid' placeholder="请选择" > 
@@ -172,11 +173,12 @@
         },
         users: [],
         totalPage: 0,
-        currentPage: 0,
+        currentPage: 1,
         pageSize: 10,
         listLoading: false,
+        classifyId:1,
         options:[],//分类信息
-        sels: [],//列表选中列
+        sels: [],//所有课程
         teachers:[],//所有老师
         schools:[],//所有学堂
 
@@ -207,14 +209,13 @@
         addLoading: false,
         addFormRules: {
           //验证规则
-          name: [
-            { required: false, message: '请输入姓名', trigger: 'blur' }
+          cid: [
+            {type:'number', required: true, message: '请选择课程', trigger: 'change' }
           ]
         },
         //新增界面数据
         addForm: {
           cid:'',
-          courseName:'',
           tid:'',
           sid:'',
           dates:''
@@ -233,6 +234,21 @@
         .done(function(res) {
          // console.log(res);
           this.options = res.data;
+        }.bind(this))
+      },
+      //获取全部课程
+      getAllClass(){
+        this.sels = [];
+        let para = {
+          classifyId : this.classifyId
+        }
+        $.ajax({
+          url:'/momingtang/web/backCourse/getClassifyCourse',
+          type:'POST',
+          data: para
+        })
+        .done(function(res){
+          this.sels = res.data
         }.bind(this))
       },
       //获取全部的老师
@@ -454,6 +470,7 @@
     mounted() {
       this.getUsers();
       this.getAllClassify();
+      this.getAllClass();
       this.getTeachers();
       this.getSchools();
     }
