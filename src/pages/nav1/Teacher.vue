@@ -175,6 +175,9 @@
 					this.users = res.data.datas;
 					this.listLoading = false;
 					NProgress.done();
+					if(res.status ==2){
+						this.$router.replace({ path: '/login' });
+					}
 				}.bind(this))
 			},
 			//删除

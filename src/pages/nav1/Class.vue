@@ -49,12 +49,12 @@
 
 		<!--编辑界面-->
 		 <el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm" name='editForm' action="/momingtang/web/backSchool/updateCourse" enctype='multipart/form-data' id='editForm' method='post'>
-				<el-form-item style='display:none'>
+			<el-form :model="editForm" label-width="100px" :rules="editFormRules" ref="editForm" name='editForm' action="/momingtang/web/backSchool/updateCourse" enctype='multipart/form-data' id='editForm' method='post'>
+				<el-form-item style='display:none' prop='sid'>
 					<el-input name='sid' v-model='editForm.sid'></el-input>
 				</el-form-item>
 				<el-form-item label="省份">
-					<el-select v-model="editForm.province" disabled @change='getAllCitys' placeholder="请选择">
+					<el-select v-model="editForm.province" @change='getAllCitys(editForm.province)' placeholder="请选择">
 					    <el-option
 					      v-for="item in province"
 					      :label="item.name"
@@ -62,28 +62,29 @@
 					    </el-option>
 					  </el-select>
 				</el-form-item>
-				<el-form-item label="市区">
-					<select name='attribution' class='classifyId' disabled placeholder="请选择">
-					    <option
-					      :label='editForm.city'
-					      :value="editForm.city">
-					    </option>
-					  </select>
+				<el-form-item label="市区" prop='attribution'>
+					<el-select v-model='editForm.city' name='attribution' placeholder="请选择">
+					    <el-option
+					     v-for="item in citys"
+					      :label='item.name'
+					      :value="item.name">
+					    </el-option>
+					  </el-select>
 				</el-form-item>
-				<el-form-item label="名称">
-					<el-input name='sName' v-model="editForm.sName" placeholder="请输入价格" class='myInput'></el-input>
+				<el-form-item label="名称" prop='sName'>
+					<el-input name='sName' v-model="editForm.sName" placeholder="请输入名称" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="详细地址">
+				<el-form-item label="详细地址" prop='address'>
 					<el-input name='address' v-model="editForm.address" placeholder="请输入内容" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label="营业时间">
+				<el-form-item label="营业时间" prop='businessHours'>
 					<el-input name='businessHours' v-model="editForm.businessHours" placeholder="请输入内容" class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label='学堂封面'>
-					<el-input type='file' name='cover' class='myInput'></el-input>
+				<el-form-item label='学堂封面' prop='cover'>
+					<el-input type='file' name='cover' v-model='editForm.cover' class='myInput'></el-input>
 				</el-form-item>
-				<el-form-item label='学堂介绍'>
-					<el-input type='file' name='sdetailsPic' class='myInput'></el-input>
+				<el-form-item label='学堂介绍' prop='sdetailsPic'>
+					<el-input type='file' name='sdetailsPic' v-model='editForm.sdetailsPic' class='myInput'></el-input>
 				</el-form-item>
 				<!-- <el-form-item label="课程内容">
 					<el-input v-model="editForm.msg" placeholder="初识古琴"></el-input>
@@ -110,12 +111,13 @@
 					  </el-select>
 				</el-form-item>
 				<el-form-item label="市区">
-					<select name='attribution' class='classifyId' placeholder="请选择城市">
-					    <option
+					<el-select v-model='addForm.attribution' name='attribution' placeholder="请选择城市">
+					    <el-option
 					      v-for="item in citys"
-					      :value="item.name">{{item.name}}
-					    </option>
-					  </select>
+					      :label='item.name'
+					      :value="item.name">
+					    </el-option>
+					  </el-select>
 				</el-form-item>
 				<el-form-item label="名称">
 					<el-input name="sName" v-model='addForm.sName' placeholder="请输入名称" class='myInput'></el-input>
@@ -173,7 +175,13 @@
 				editLoading: false,
 				editFormRules: {
 					sName: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
+						{ required: true, message: '请输入名称', trigger: 'blur' }
+					],
+					address: [
+						{type:'string',required: true, message: '请输入地址', trigger: 'blur' }
+					],
+					businessHours:[
+						{type:'string',required: true, message: '请输入时间范围', trigger: 'blur' }
 					]
 				},
 				//编辑界面数据
@@ -210,6 +218,7 @@
 				    businessHours:'',
 				    address: "",
 				    province: "",
+				    city:'',
 				    attribution: ""
 				}
 
@@ -237,12 +246,12 @@
 				}.bind(this))
 			},
 			//获取市区
-			getAllCitys(){
+			getAllCitys(a){
 				let para = {
-					pid : this.id
+					pid : a
 				}
 				$.ajax({
-					url: ' /momingtang/region/getRegions',
+					url: '/momingtang/region/getRegions',
 					type: 'POST',
 					data:para
 				})
@@ -273,6 +282,9 @@
 					this.users = res.data.datas;
 					this.listLoading = false;
 					NProgress.done();
+					if(res.status ==2){
+						this.$router.replace({ path: '/login' });
+					}
 				}.bind(this))
 			},
 			//删除
@@ -317,10 +329,13 @@
 			handleEdit: function (index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
+				this.getAllProvince();
 			},
 			//显示新增界面
 			handleAdd: function () {
 				this.addFormVisible = true;
+				this.getAllProvince();
+				this.getAllCitys(1)
 			},
 			//编辑
 			editSubmit: function () {
@@ -334,7 +349,7 @@
 						url:'/momingtang/web/backSchool/updateCourse',
 						type:'post',
 						beforeSerialize:function(res){
-							//console.log(res);
+							console.log(res);
 						},
 						beforeSubmit:function(res){
 							//console.log(res)
@@ -349,7 +364,7 @@
 									message: '提交成功',
 									type: 'success'
 								});
-								vm.$refs.editForm.resetFields();
+								this.getUsers();
 							}else{
 								this.$notify({
 									title: '失败',
@@ -358,67 +373,13 @@
 								});
 							}
 							this.editFormVisible = false;
-							this.getUsers();
-						}.bind(this),
-						error: function(res) {
-							this.editLoading = false;
-							NProgress.done();
-							console.log(res)
-							this.$notify({
-								title: '失败',
-								message: '提交失败',
-								type: 'error'
-							});
 						}.bind(this)
 					})
 				});
-				/*this.$refs.editForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.editLoading = true;
-							NProgress.start();
-							let para = Object.assign({}, this.editForm);
-							para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							editUser(para).then((res) => {
-								this.editLoading = false;
-								NProgress.done();
-								this.$notify({
-									title: '成功',
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['editForm'].resetFields();
-								this.editFormVisible = false;
-								this.getUsers();
-							});
-						});
-					}
-				});*/
 			},
 			//新增
 			addSubmit: function (e) {
-				/*this.$refs.addForm.validate((valid) => {
-					if (valid) {
-						this.$confirm('确认提交吗？', '提示', {}).then(() => {
-							this.addLoading = true;
-							NProgress.start();
-							let para = Object.assign({}, this.addForm);
-							/*para.birth = (!para.birth || para.birth == '') ? '' : util.formatDate.format(new Date(para.birth), 'yyyy-MM-dd');
-							addUser(para).then((res) => {
-								this.addLoading = false;
-								NProgress.done();
-								this.$notify({
-									title: '成功',
-									message: '提交成功',
-									type: 'success'
-								});
-								this.$refs['addForm'].resetFields();
-								this.addFormVisible = false;
-								this.getUsers();
-							});
-						});
-					}
-				});*/
+				var vm = this;
 				this.$confirm('确认提交吗？', '提示', {}).then(() => {
 					this.addLoading = true;
 					NProgress.start();
@@ -429,7 +390,7 @@
 							console.log(res)
 						},
 						beforeSubmit:function(res){
-							console.log(res)
+							//console.log(res)
 						},
 						success: function(res){
 							console.log(res)
@@ -441,6 +402,7 @@
 									message: '提交成功',
 									type: 'success'
 								});
+								this.getUsers();
 								this.$refs.addForm.resetFields();
 							}else{
 								this.$notify({
@@ -450,7 +412,6 @@
 								});
 							}
 							this.addFormVisible = false;
-							this.getUsers();
 						}.bind(this),
 						error: function(res) {
 							this.addLoading = false;
@@ -467,8 +428,6 @@
 		},
 		mounted() {
 			this.getUsers();
-			this.getAllProvince();
-			this.getAllCitys();
 		}
 	}
 

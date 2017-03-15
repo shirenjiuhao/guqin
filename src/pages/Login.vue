@@ -68,7 +68,6 @@
                 _this.$router.params = res.data;
                 sessionStorage.setItem('user', JSON.stringify(loginParams));
                 _this.$router.replace({ path: '/course' });
-                showTime();
               }   
             });
           } else {

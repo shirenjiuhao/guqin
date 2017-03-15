@@ -119,8 +119,10 @@
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;
-				  }else{
+				  }else if(res.status ==0){
 				  	this.users = [];
+				  }else if(res.status ==2){
+						this.$router.replace({ path: '/login' });
 				  }
 				  this.listLoading = false;
 				  NProgress.done();
