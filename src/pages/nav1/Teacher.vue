@@ -169,11 +169,11 @@
 				})
 				.done(function(res) {
 					console.log(res);
+					this.listLoading = false;
 					this.totalPage = res.data.totalRecord;
 					this.currentPage = res.data.currentPage;
 					this.pageSize = res.data.pageSize;
 					this.users = res.data.datas;
-					this.listLoading = false;
 					NProgress.done();
 					if(res.status ==2){
 						this.$router.replace({ path: '/login' });

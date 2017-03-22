@@ -113,7 +113,6 @@
 				})
 				.done(function(res) {
 				  console.log(res);
-				  NProgress.done();
 				  if(res.status == 1){
 				  	this.totalPage = res.data.totalRecord;
 					this.currentPage = res.data.currentPage;

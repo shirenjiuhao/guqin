@@ -217,15 +217,20 @@
 				})
 				.done(function(res) {
 					console.log(res);
-					this.totalPage = res.data.totalRecord;
-					this.currentPage = res.data.currentPage;
-					this.pageSize = res.data.pageSize;
-					this.users = res.data.datas;
-					this.listLoading = false;
-					NProgress.done();
+					if(res.status == 0){
+						this.listLoading = false;
+					}
+					if(res.status ==1){
+						this.listLoading = false;
+						this.totalPage = res.data.totalRecord;
+						this.currentPage = res.data.currentPage;
+						this.pageSize = res.data.pageSize;
+						this.users = res.data.datas;
+					}
 					if(res.status ==2){
 						this.$router.replace({ path: '/login' });
 					}
+					NProgress.done();
 				}.bind(this))
 			},
 			//获取新增数据分类
