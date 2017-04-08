@@ -16,15 +16,6 @@ npm run dev
 npm run build
 
 ```
-
-### Browser Support
-
-Modern browsers and Internet Explorer 10+.
-
-### snapshots
-![image](https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/login.png)
-![image](https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/main.png)
-![image](https://raw.githubusercontent.com/taylorchen709/markdown-images/master/vueadmin/edit.jpg)
-
-### License
-[MIT](http://opensource.org/licenses/MIT)
+# 数据来源 http://120.77.246.117:8080/momingtang/
+# 全部使用相对路径
+# 本地访问需代理
